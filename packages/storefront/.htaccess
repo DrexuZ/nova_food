@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Proxy API requests to Render backend
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^api/(.*)$ proxy.php?api_path=/api/$1 [L,QSA]
+
+# SPA fallback
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.html [L]

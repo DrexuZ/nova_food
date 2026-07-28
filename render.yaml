@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: kitchenasty-api
+    env: node
+    region: ohio
+    plan: free
+    buildCommand: npm install && npm run build -w packages/shared && npx prisma generate --schema prisma/schema.prisma && npm run build -w packages/server
+    startCommand: node packages/server/dist/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        value: postgresql://postgres:nuttertoolsdcs27%23Z@db.vjomuqqdazkkuwmonkyf.supabase.co:5432/postgres
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGINS
+        value: https://food.novasolum.cloud,https://novasolum.cloud
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false

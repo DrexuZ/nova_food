@@ -21,10 +21,16 @@ export default function Login({ onLogin }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
+      console.log('[Login] status:', res.status);
+      const text = await res.text();
+      console.log('[Login] body length:', text.length);
+      console.log('[Login] body preview:', text.substring(0, 300));
+      if (!text) throw new Error('Empty response from /api/auth/staff/login');
+      const data = JSON.parse(text);
       if (!res.ok) throw new Error(data.error || 'Login failed');
       onLogin(data.data.token);
     } catch (err: any) {
+      console.error('[Login] error:', err.message);
       setError(err.message);
     } finally {
       setLoading(false);

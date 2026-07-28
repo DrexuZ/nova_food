@@ -286,7 +286,7 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
     },
   });
 
-  // Decrement stock for tracked items
+  // Decrement stock & ingredient inventory
   for (const item of items) {
     const menuItem = menuItemMap.get(item.menuItemId)!;
     if (menuItem.trackStock) {
@@ -294,6 +294,37 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
         where: { id: item.menuItemId },
         data: { stockQty: { decrement: item.quantity } },
       });
+    }
+
+    // Decrement recipe ingredients
+    const recipe = await prisma.recipe.findUnique({
+      where: { menuItemId: item.menuItemId },
+      include: { ingredients: true },
+    });
+    if (recipe && recipe.ingredients.length > 0) {
+      for (const ri of recipe.ingredients) {
+        const ingredient = await prisma.ingredient.findUnique({ where: { id: ri.ingredientId } });
+        if (!ingredient) continue;
+        const totalQty = ri.quantity * item.quantity;
+        const newStock = Math.max(0, ingredient.stock - totalQty);
+        await prisma.$transaction([
+          prisma.ingredient.update({
+            where: { id: ri.ingredientId },
+            data: { stock: newStock },
+          }),
+          prisma.inventoryMovement.create({
+            data: {
+              ingredientId: ri.ingredientId,
+              type: 'SALE',
+              quantity: -totalQty,
+              stockBefore: ingredient.stock,
+              stockAfter: newStock,
+              reference: `Order #${order.orderNumber}`,
+              createdById: (req as any).user?.id,
+            },
+          }),
+        ]);
+      }
     }
   }
 

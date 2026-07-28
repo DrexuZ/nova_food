@@ -72,12 +72,16 @@ export default function Dashboard() {
     fetch(`/api/dashboard/stats`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => {
+      .then(async (res) => {
+        console.log('[Dashboard] /api/dashboard/stats status:', res.status);
         if (!res.ok) throw new Error('Failed to load dashboard');
-        return res.json();
+        const text = await res.text();
+        console.log('[Dashboard] /api/dashboard/stats body:', text.substring(0, 300));
+        if (!text) throw new Error('Empty response from /api/dashboard/stats');
+        return JSON.parse(text);
       })
       .then((result) => setData(result.data))
-      .catch((err) => setError(err.message))
+      .catch((err) => { console.warn('[Dashboard] stats error:', err.message); setError(err.message); })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -86,12 +90,16 @@ export default function Dashboard() {
     fetch(`/api/dashboard/analytics?days=${analyticsDays}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => {
+      .then(async (res) => {
+        console.log('[Dashboard] /api/dashboard/analytics status:', res.status);
         if (!res.ok) throw new Error('Failed to load analytics');
-        return res.json();
+        const text = await res.text();
+        console.log('[Dashboard] /api/dashboard/analytics body:', text.substring(0, 300));
+        if (!text) throw new Error('Empty response from /api/dashboard/analytics');
+        return JSON.parse(text);
       })
       .then((result) => setAnalytics(result.data))
-      .catch(() => { })
+      .catch((err) => { console.warn('[Dashboard] analytics error:', err.message); })
       .finally(() => setAnalyticsLoading(false));
   }, [token, analyticsDays]);
 

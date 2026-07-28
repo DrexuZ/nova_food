@@ -24,6 +24,21 @@ import NotFound from './pages/NotFound.js';
 import './i18n/index.js';
 import './index.css';
 
+// Bypass Hostinger proxy via CORS direct to Render
+const API_BASE = import.meta.env.VITE_API_URL || '';
+if (API_BASE) {
+  console.log('[Storefront] Using direct API base:', API_BASE);
+  const origFetch = window.fetch.bind(window);
+  window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+    let url = typeof input === 'string' ? input : input instanceof Request ? input.url : input.toString();
+    if (url.startsWith('/api/')) {
+      url = API_BASE + url;
+      return origFetch(url, { ...init, mode: 'cors' });
+    }
+    return origFetch(input, init);
+  };
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>

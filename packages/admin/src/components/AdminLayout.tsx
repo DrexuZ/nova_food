@@ -38,6 +38,17 @@ const navItems: NavItem[] = [
       { path: '/menu/categories', label: 'Categories' },
     ],
   },
+  {
+    path: '/inventory',
+    label: 'Inventory',
+    icon: '\uD83D\uDCE6',
+    roles: ['SUPER_ADMIN', 'MANAGER'],
+    children: [
+      { path: '/inventory/ingredients', label: 'Ingredients' },
+      { path: '/inventory/movements', label: 'Movements' },
+      { path: '/inventory/alerts', label: 'Stock Alerts' },
+    ],
+  },
   { path: '/coupons', label: 'Coupons', icon: '\uD83C\uDFF7', roles: ['SUPER_ADMIN', 'MANAGER'] },
   { path: '/automation', label: 'Automation', icon: '\u26A1', roles: ['SUPER_ADMIN', 'MANAGER'] },
   { path: '/loyalty', label: 'Loyalty', icon: '\uD83C\uDF81', roles: ['SUPER_ADMIN', 'MANAGER'] },
@@ -109,7 +120,7 @@ export default function AdminLayout({ children, onLogout }: { children: React.Re
 
     async function fetchPending() {
       try {
-        const res = await fetch('/api/dashboard', {
+        const res = await fetch('/api/dashboard/stats', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

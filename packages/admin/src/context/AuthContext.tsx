@@ -33,22 +33,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     let cancelled = false;
     setLoading(true);
+    console.log('[Auth] Validating token...');
 
     fetch('/api/auth/me', {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) throw new Error('Unauthorized');
-        return res.json();
+        const text = await res.text();
+        console.log('[Auth] /api/auth/me body:', text.substring(0, 200));
+        if (!text) throw new Error('Empty response from /api/auth/me');
+        return JSON.parse(text);
       })
       .then((data) => {
         if (!cancelled) {
           setUser(data.data.user);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.warn('[Auth] /api/auth/me failed:', err.message);
         if (!cancelled) {
-          // Token invalid — clear it
           localStorage.removeItem('token');
           setToken('');
           setUser(null);

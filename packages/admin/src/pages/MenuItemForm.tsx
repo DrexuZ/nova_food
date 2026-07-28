@@ -594,6 +594,11 @@ export default function MenuItemForm() {
 
         {/* Submit */}
         <div className="flex justify-end gap-3">
+          {isEdit && (
+            <button type="button" onClick={() => navigate(`/menu/items/${id}/recipe`)} className="px-6 py-2 border border-blue-300 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors">
+              Manage Recipe
+            </button>
+          )}
           <button type="button" onClick={() => navigate('/menu/items')} className="px-6 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
             Cancel
           </button>

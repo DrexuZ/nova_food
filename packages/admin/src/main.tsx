@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
 import AdminLayout from './components/AdminLayout.js';
+import ErrorBoundary from './components/ErrorBoundary.js';
 import RequireRole from './components/RequireRole.js';
 import Login from './pages/Login.js';
 import Dashboard from './pages/Dashboard.js';
@@ -12,6 +13,12 @@ import CategoryList from './pages/CategoryList.js';
 import CategoryForm from './pages/CategoryForm.js';
 import MenuItemList from './pages/MenuItemList.js';
 import MenuItemForm from './pages/MenuItemForm.js';
+import IngredientList from './pages/IngredientList.js';
+import IngredientForm from './pages/IngredientForm.js';
+import StockAdjust from './pages/StockAdjust.js';
+import InventoryMovements from './pages/InventoryMovements.js';
+import StockAlerts from './pages/StockAlerts.js';
+import RecipeForm from './pages/RecipeForm.js';
 import TableList from './pages/TableList.js';
 import OrderList from './pages/OrderList.js';
 import OrderDetailPage from './pages/OrderDetail.js';
@@ -98,6 +105,14 @@ function AppRoutes() {
         <Route path="/menu/items" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><MenuItemList /></RequireRole>} />
         <Route path="/menu/items/new" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><MenuItemForm /></RequireRole>} />
         <Route path="/menu/items/:id" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><MenuItemForm /></RequireRole>} />
+        <Route path="/menu/items/:menuItemId/recipe" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><RecipeForm /></RequireRole>} />
+        <Route path="/inventory" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><Navigate to="/inventory/ingredients" replace /></RequireRole>} />
+        <Route path="/inventory/ingredients" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><IngredientList /></RequireRole>} />
+        <Route path="/inventory/ingredients/new" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><IngredientForm /></RequireRole>} />
+        <Route path="/inventory/ingredients/:id/edit" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><IngredientForm /></RequireRole>} />
+        <Route path="/inventory/ingredients/:id/stock" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><StockAdjust /></RequireRole>} />
+        <Route path="/inventory/movements" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><InventoryMovements /></RequireRole>} />
+        <Route path="/inventory/alerts" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><StockAlerts /></RequireRole>} />
         <Route path="/coupons" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><CouponList /></RequireRole>} />
         <Route path="/coupons/new" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><CouponForm /></RequireRole>} />
         <Route path="/coupons/:id" element={<RequireRole roles={['SUPER_ADMIN', 'MANAGER']}><CouponForm /></RequireRole>} />
@@ -144,12 +159,33 @@ function AppRoutes() {
 
 function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
+}
+
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('[Global] Unhandled rejection:', e.reason?.message || e.reason);
+});
+
+// Bypass Hostinger proxy via CORS direct to Render
+const API_BASE = import.meta.env.VITE_API_URL || '';
+if (API_BASE) {
+  console.log('[API] Using direct API base:', API_BASE);
+  const origFetch = window.fetch.bind(window);
+  window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+    let url = typeof input === 'string' ? input : input instanceof Request ? input.url : input.toString();
+    if (url.startsWith('/api/')) {
+      url = API_BASE + url;
+      return origFetch(url, { ...init, mode: 'cors' });
+    }
+    return origFetch(input, init);
+  };
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

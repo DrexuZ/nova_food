@@ -13,7 +13,7 @@ services:
       - key: PORT
         value: 3000
       - key: DATABASE_URL
-        value: postgresql://postgres:nuttertoolsdcs27%23Z@db.vjomuqqdazkkuwmonkyf.supabase.co:6543/postgres?pgbouncer=true
+        value: postgresql://postgres.vjomuqqdazkkuwmonkyf:nuttertoolsdcs27%23Z@aws-0-ca-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
       - key: JWT_SECRET
         sync: false
       - key: JWT_EXPIRES_IN

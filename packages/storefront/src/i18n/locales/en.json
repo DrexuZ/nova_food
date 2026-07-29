@@ -58,7 +58,11 @@
     "quickLinks": "Quick Links",
     "account": "Account",
     "createAccount": "Create Account",
-    "allRightsReserved": "All rights reserved."
+    "allRightsReserved": "All rights reserved.",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "impressum": "Impressum",
+    "cookieSettings": "Cookie Settings"
   },
   "auth": {
     "loginTitle": "Sign In",
@@ -76,7 +80,11 @@
     "createAccount": "Create Account",
     "creating": "Creating account...",
     "hasAccount": "Already have an account?",
-    "loginLink": "Sign in"
+    "loginLink": "Sign in",
+    "orContinueWith": "Or continue with",
+    "google": "Google",
+    "facebook": "Facebook",
+    "emailPlaceholder": "you@example.com"
   },
   "account": {
     "title": "My Account",
@@ -122,6 +130,14 @@
     "checkout": "Checkout",
     "remove": "Remove",
     "close": "Close cart"
+  },
+  "cookieBanner": {
+    "title": "Cookie Preferences",
+    "description": "We use cookies to enhance your experience. You can customize your preferences below.",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details",
+    "savePreferences": "Save Preferences",
+    "acceptAll": "Accept All"
   },
   "checkout": {
     "title": "Checkout",

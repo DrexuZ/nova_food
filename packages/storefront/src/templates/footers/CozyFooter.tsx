@@ -73,16 +73,16 @@ export default function CozyFooter() {
 
           {/* Legal */}
           <div>
-            <h3 className="text-amber-900 font-semibold mb-4">Legal</h3>
+            <h3 className="text-amber-900 font-semibold mb-4">{t('footer.legal')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/privacy-policy" className="hover:text-amber-950 transition-colors bg-amber-100 rounded-full px-3 py-1 inline-block">
-                  Privacy Policy
+                  {t('footer.privacyPolicy')}
                 </Link>
               </li>
               <li>
                 <Link to="/impressum" className="hover:text-amber-950 transition-colors bg-amber-100 rounded-full px-3 py-1 inline-block">
-                  Impressum
+                  {t('footer.impressum')}
                 </Link>
               </li>
               <li>
@@ -90,7 +90,7 @@ export default function CozyFooter() {
                   onClick={() => window.dispatchEvent(new Event('open-cookie-settings'))}
                   className="hover:text-amber-950 transition-colors bg-amber-100 rounded-full px-3 py-1 inline-block"
                 >
-                  Cookie Settings
+                  {t('footer.cookieSettings')}
                 </button>
               </li>
             </ul>

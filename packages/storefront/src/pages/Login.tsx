@@ -50,7 +50,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
-              placeholder="you@example.com"
+              placeholder={t('auth.emailPlaceholder')}
             />
           </div>
 
@@ -81,7 +81,7 @@ export default function Login() {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-2 text-gray-500">Or continue with</span>
+              <span className="bg-white px-2 text-gray-500">{t('auth.orContinueWith')}</span>
             </div>
           </div>
 
@@ -90,13 +90,13 @@ export default function Login() {
               href="/api/auth/google"
               className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              Google
+              {t('auth.google')}
             </a>
             <a
               href="/api/auth/facebook"
               className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              Facebook
+              {t('auth.facebook')}
             </a>
           </div>
 

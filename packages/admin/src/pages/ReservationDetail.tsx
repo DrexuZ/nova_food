@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface Table {
   id: string;
@@ -30,6 +31,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function ReservationDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [reservation, setReservation] = useState<ReservationData | null>(null);
   const [tables, setTables] = useState<Table[]>([]);
@@ -84,7 +86,7 @@ export default function ReservationDetail() {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label="Loading" />
+        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label={t('common.loading')} />
       </div>
     );
   }
@@ -92,9 +94,9 @@ export default function ReservationDetail() {
   if (error || !reservation) {
     return (
       <div>
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-4">{error || 'Reservation not found'}</div>
+        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-4">{error || t('reservationDetail.notFound')}</div>
         <Link to="/reservations" className="text-primary-600 hover:text-primary-700 text-sm">
-          Back to Reservations
+          {t('reservationDetail.back')}
         </Link>
       </div>
     );
@@ -103,13 +105,13 @@ export default function ReservationDetail() {
   return (
     <div>
       <div className="flex items-center gap-4 mb-6">
-        <Link to="/reservations" className="text-gray-400 hover:text-gray-600" aria-label="Back to reservations">
+        <Link to="/reservations" className="text-gray-400 hover:text-gray-600" aria-label={t('reservationDetail.backLabel')}>
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reservation Details</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('reservationDetail.title')}</h1>
           <p className="text-sm text-gray-500">
             {new Date(reservation.date).toLocaleDateString()} at {reservation.time}
           </p>
@@ -124,55 +126,55 @@ export default function ReservationDetail() {
         <div className="lg:col-span-2 space-y-6">
           {/* Guest Info */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Guest Information</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('reservationDetail.guestInfo')}</h2>
             <dl className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <dt className="text-gray-500">Name</dt>
+                <dt className="text-gray-500">{t('reservationDetail.name')}</dt>
                 <dd className="font-medium text-gray-900">{reservation.customer.name}</dd>
               </div>
               <div>
-                <dt className="text-gray-500">Email</dt>
+                <dt className="text-gray-500">{t('reservationDetail.email')}</dt>
                 <dd className="font-medium text-gray-900">{reservation.customer.email}</dd>
               </div>
               {reservation.customer.phone && (
                 <div>
-                  <dt className="text-gray-500">Phone</dt>
+                  <dt className="text-gray-500">{t('reservationDetail.phone')}</dt>
                   <dd className="font-medium text-gray-900">{reservation.customer.phone}</dd>
                 </div>
               )}
               <div>
-                <dt className="text-gray-500">Party Size</dt>
-                <dd className="font-medium text-gray-900">{reservation.partySize} guests</dd>
+                <dt className="text-gray-500">{t('reservationDetail.partySize')}</dt>
+                <dd className="font-medium text-gray-900">{reservation.partySize} {t('reservationDetail.guests')}</dd>
               </div>
             </dl>
           </div>
 
           {/* Reservation Details */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Details</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('reservationDetail.details')}</h2>
             <dl className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <dt className="text-gray-500">Date</dt>
+                <dt className="text-gray-500">{t('reservationDetail.date')}</dt>
                 <dd className="font-medium text-gray-900">{new Date(reservation.date).toLocaleDateString()}</dd>
               </div>
               <div>
-                <dt className="text-gray-500">Time</dt>
+                <dt className="text-gray-500">{t('reservationDetail.time')}</dt>
                 <dd className="font-medium text-gray-900">{reservation.time}</dd>
               </div>
               <div>
-                <dt className="text-gray-500">Location</dt>
+                <dt className="text-gray-500">{t('reservationDetail.location')}</dt>
                 <dd className="font-medium text-gray-900">{reservation.location.name}</dd>
               </div>
               <div>
-                <dt className="text-gray-500">Table</dt>
+                <dt className="text-gray-500">{t('reservationDetail.table')}</dt>
                 <dd className="font-medium text-gray-900">
-                  {reservation.table ? `${reservation.table.name} (seats ${reservation.table.capacity})` : 'Unassigned'}
+                  {reservation.table ? `${reservation.table.name} (seats ${reservation.table.capacity})` : t('reservationDetail.unassigned')}
                 </dd>
               </div>
             </dl>
             {reservation.comment && (
               <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Special Requests</p>
+                <p className="text-xs text-gray-500 mb-1">{t('reservationDetail.specialRequests')}</p>
                 <p className="text-sm text-gray-700">{reservation.comment}</p>
               </div>
             )}
@@ -183,7 +185,7 @@ export default function ReservationDetail() {
         <div className="space-y-6">
           {/* Status Update */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Update Status</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('reservationDetail.updateStatus')}</h2>
             <div className="space-y-2">
               {STATUSES.map((status) => (
                 <button
@@ -194,7 +196,7 @@ export default function ReservationDetail() {
                       ? STATUS_COLORS[status] + ' cursor-default'
                       : 'text-gray-600 hover:bg-gray-100 disabled:opacity-40'
                     }`}
-                  aria-label={`Set status to ${status} for ${reservation.customer.name}'s reservation`}
+                  aria-label={t('reservationDetail.setStatusTo', { status, name: reservation.customer.name })}
                 >
                   {status}
                 </button>
@@ -204,15 +206,15 @@ export default function ReservationDetail() {
 
           {/* Table Assignment */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Assign Table</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('reservationDetail.assignTable')}</h2>
             <select
               value={reservation.table?.id || ''}
               onChange={(e) => updateReservation({ tableId: e.target.value || null })}
               disabled={updating}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-              aria-label="Assign table"
+              aria-label={t('reservationDetail.assignTableLabel')}
             >
-              <option value="">No table assigned</option>
+              <option value="">{t('reservationDetail.noTable')}</option>
               {tables.map((table) => (
                 <option key={table.id} value={table.id}>
                   {table.name} (seats {table.capacity})

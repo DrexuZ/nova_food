@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.js';
+import { useTranslation } from 'react-i18next';
+import i18n, { SUPPORTED_LANGUAGES } from '../i18n/index.js';
 
 type Role = 'SUPER_ADMIN' | 'MANAGER' | 'STAFF';
 
@@ -12,84 +14,7 @@ interface NavItem {
   children?: { path: string; label: string }[];
 }
 
-const navItems: NavItem[] = [
-  { path: '/', label: 'Dashboard', icon: '\u25A1', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
-  { path: '/orders', label: 'Orders', icon: '\uD83D\uDCCB', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
-  {
-    path: '/reservations',
-    label: 'Reservations',
-    icon: '\uD83D\uDDD3',
-    roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'],
-    children: [
-      { path: '/reservations', label: 'All Reservations' },
-      { path: '/reservations/trends', label: 'Trends' },
-    ],
-  },
-  { path: '/reviews', label: 'Reviews', icon: '\u2B50', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
-  { path: '/kitchen', label: 'Kitchen', icon: '\uD83C\uDF73', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
-  { path: '/locations', label: 'Locations', icon: '\u25CE', roles: ['SUPER_ADMIN', 'MANAGER'] },
-  {
-    path: '/menu',
-    label: 'Menu',
-    icon: '\u2630',
-    roles: ['SUPER_ADMIN', 'MANAGER'],
-    children: [
-      { path: '/menu/items', label: 'Items' },
-      { path: '/menu/categories', label: 'Categories' },
-    ],
-  },
-  {
-    path: '/inventory',
-    label: 'Inventory',
-    icon: '\uD83D\uDCE6',
-    roles: ['SUPER_ADMIN', 'MANAGER'],
-    children: [
-      { path: '/inventory/ingredients', label: 'Ingredients' },
-      { path: '/inventory/movements', label: 'Movements' },
-      { path: '/inventory/alerts', label: 'Stock Alerts' },
-    ],
-  },
-  { path: '/coupons', label: 'Coupons', icon: '\uD83C\uDFF7', roles: ['SUPER_ADMIN', 'MANAGER'] },
-  { path: '/automation', label: 'Automation', icon: '\u26A1', roles: ['SUPER_ADMIN', 'MANAGER'] },
-  { path: '/loyalty', label: 'Loyalty', icon: '\uD83C\uDF81', roles: ['SUPER_ADMIN', 'MANAGER'] },
-  {
-    path: '/design',
-    label: 'Design',
-    icon: '\uD83C\uDFA8',
-    roles: ['SUPER_ADMIN', 'MANAGER'],
-    children: [
-      { path: '/design/landing', label: 'Landing Page' },
-      { path: '/design/branding', label: 'Branding' },
-      { path: '/design/theme', label: 'Theme' },
-      { path: '/design/templates', label: 'Templates' },
-      { path: '/design/gallery', label: 'Gallery' },
-      { path: '/design/media', label: 'Media Library' },
-    ],
-  },
-  {
-    path: '/legal',
-    label: 'Legal',
-    icon: '\u2696',
-    roles: ['SUPER_ADMIN', 'MANAGER'],
-    children: [
-      { path: '/legal/pages', label: 'Pages' },
-      { path: '/legal/cookies', label: 'Cookie Categories' },
-      { path: '/legal/consent', label: 'Consent Log' },
-    ],
-  },
-  { path: '/settings', label: 'Settings', icon: '\u2699', roles: ['SUPER_ADMIN', 'MANAGER'] },
-  {
-    path: '/developer',
-    label: 'Developer',
-    icon: '\uD83D\uDEE0',
-    roles: ['SUPER_ADMIN', 'MANAGER'],
-    children: [
-      { path: '/developer/metrics', label: 'API Metrics' },
-      { path: '/developer/audit-log', label: 'Audit Log' },
-    ],
-  },
-  { path: '/staff', label: 'Staff', icon: '\uD83D\uDC65', roles: ['SUPER_ADMIN'] },
-];
+
 
 const ROLE_COLORS: Record<Role, string> = {
   SUPER_ADMIN: 'bg-red-500/20 text-red-300',
@@ -97,11 +22,7 @@ const ROLE_COLORS: Record<Role, string> = {
   STAFF: 'bg-gray-500/20 text-gray-300',
 };
 
-const ROLE_LABELS: Record<Role, string> = {
-  SUPER_ADMIN: 'Super Admin',
-  MANAGER: 'Manager',
-  STAFF: 'Staff',
-};
+
 
 export default function AdminLayout({ children, onLogout }: { children: React.ReactNode; onLogout?: () => void }) {
   const location = useLocation();
@@ -109,6 +30,92 @@ export default function AdminLayout({ children, onLogout }: { children: React.Re
   const [pendingCount, setPendingCount] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
+
+  const navItems = useMemo<NavItem[]>(() => [
+    { path: '/', label: t('nav.dashboard'), icon: '□', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
+    { path: '/orders', label: t('nav.orders'), icon: '📋', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
+    {
+      path: '/reservations',
+      label: t('nav.reservations'),
+      icon: '🗓',
+      roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'],
+      children: [
+        { path: '/reservations', label: t('nav.reservationsAll') },
+        { path: '/reservations/trends', label: t('nav.reservationsTrends') },
+      ],
+    },
+    { path: '/reviews', label: t('nav.reviews'), icon: '⭐', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
+    { path: '/kitchen', label: t('nav.kitchen'), icon: '🍳', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
+    { path: '/locations', label: t('nav.locations'), icon: '◎', roles: ['SUPER_ADMIN', 'MANAGER'] },
+    {
+      path: '/menu',
+      label: t('nav.menu'),
+      icon: '☰',
+      roles: ['SUPER_ADMIN', 'MANAGER'],
+      children: [
+        { path: '/menu/items', label: t('nav.menuItems') },
+        { path: '/menu/categories', label: t('nav.menuCategories') },
+      ],
+    },
+    {
+      path: '/inventory',
+      label: t('nav.inventory'),
+      icon: '📦',
+      roles: ['SUPER_ADMIN', 'MANAGER'],
+      children: [
+        { path: '/inventory/ingredients', label: t('nav.inventoryIngredients') },
+        { path: '/inventory/movements', label: t('nav.inventoryMovements') },
+        { path: '/inventory/alerts', label: t('nav.inventoryAlerts') },
+      ],
+    },
+    { path: '/coupons', label: t('nav.coupons'), icon: '🏷', roles: ['SUPER_ADMIN', 'MANAGER'] },
+    { path: '/automation', label: t('nav.automation'), icon: '⚡', roles: ['SUPER_ADMIN', 'MANAGER'] },
+    { path: '/loyalty', label: t('nav.loyalty'), icon: '🎁', roles: ['SUPER_ADMIN', 'MANAGER'] },
+    {
+      path: '/design',
+      label: t('nav.design'),
+      icon: '🎨',
+      roles: ['SUPER_ADMIN', 'MANAGER'],
+      children: [
+        { path: '/design/landing', label: t('nav.designLanding') },
+        { path: '/design/branding', label: t('nav.designBranding') },
+        { path: '/design/theme', label: t('nav.designTheme') },
+        { path: '/design/templates', label: t('nav.designTemplates') },
+        { path: '/design/gallery', label: t('nav.designGallery') },
+        { path: '/design/media', label: t('nav.designMedia') },
+      ],
+    },
+    {
+      path: '/legal',
+      label: t('nav.legal'),
+      icon: '⚖',
+      roles: ['SUPER_ADMIN', 'MANAGER'],
+      children: [
+        { path: '/legal/pages', label: t('nav.legalPages') },
+        { path: '/legal/cookies', label: t('nav.legalCookies') },
+        { path: '/legal/consent', label: t('nav.legalConsent') },
+      ],
+    },
+    { path: '/settings', label: t('nav.settings'), icon: '⚙', roles: ['SUPER_ADMIN', 'MANAGER'] },
+    {
+      path: '/developer',
+      label: t('nav.developer'),
+      icon: '🛠',
+      roles: ['SUPER_ADMIN', 'MANAGER'],
+      children: [
+        { path: '/developer/metrics', label: t('nav.developerMetrics') },
+        { path: '/developer/audit-log', label: t('nav.developerAudit') },
+      ],
+    },
+    { path: '/staff', label: t('nav.staff'), icon: '👥', roles: ['SUPER_ADMIN'] },
+  ], [t]);
+
+  const ROLE_LABELS: Record<Role, string> = {
+    SUPER_ADMIN: t('role.superAdmin'),
+    MANAGER: t('role.manager'),
+    STAFF: t('role.staff'),
+  };
 
   const filteredNav = user
     ? navItems.filter((item) => item.roles.includes(user.role))
@@ -151,10 +158,10 @@ export default function AdminLayout({ children, onLogout }: { children: React.Re
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 text-white flex flex-col" role="navigation" aria-label="Main navigation">
+      <aside className="w-64 bg-gray-900 text-white flex flex-col" role="navigation" aria-label={t('nav.mainNavigation')}>
         <div className="px-6 py-4 border-b border-gray-700">
           <h1 className="text-xl font-bold text-primary-400">KitchenAsty</h1>
-          <p className="text-xs text-gray-400 mt-1">Admin Panel</p>
+          <p className="text-xs text-gray-400 mt-1">{t('common.adminPanel')}</p>
         </div>
         <nav className="flex-1 py-4">
           {filteredNav.map((item) => {
@@ -215,14 +222,14 @@ export default function AdminLayout({ children, onLogout }: { children: React.Re
             <Link
               to="/orders?status=PENDING"
               className="relative p-2 text-gray-400 hover:text-gray-600 transition-colors"
-              title="Pending orders"
-              aria-label="Pending orders"
+              title={t('nav.pendingOrders')}
+              aria-label={t('nav.pendingOrders')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
               <span className="sr-only" aria-live="polite">
-                {pendingCount > 0 ? `${pendingCount} pending order${pendingCount === 1 ? '' : 's'}` : ''}
+                {pendingCount > 0 ? t('nav.pendingOrdersCount', { count: pendingCount }) : ''}
               </span>
               {pendingCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-red-500 rounded-full" aria-hidden="true">
@@ -236,8 +243,8 @@ export default function AdminLayout({ children, onLogout }: { children: React.Re
               <Link
                 to="/settings"
                 className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                title="Settings"
-                aria-label="Settings"
+                title={t('nav.settingsLink')}
+                aria-label={t('nav.settingsLink')}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -245,6 +252,24 @@ export default function AdminLayout({ children, onLogout }: { children: React.Re
                 </svg>
               </Link>
             )}
+
+            {/* Language Switcher */}
+            <div className="flex items-center gap-1">
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => i18n.changeLanguage(lang.code)}
+                  className={`px-2 py-1 text-xs font-medium rounded transition-colors ${i18n.language === lang.code
+                    ? 'bg-primary-100 text-primary-700'
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                    }`}
+                  title={lang.name}
+                  aria-label={lang.name}
+                >
+                  {lang.flag}
+                </button>
+              ))}
+            </div>
 
             {/* Separator */}
             <div className="w-px h-6 bg-gray-200" />
@@ -276,7 +301,7 @@ export default function AdminLayout({ children, onLogout }: { children: React.Re
                         onClick={() => setDropdownOpen(false)}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                       >
-                        Settings
+                        {t('nav.settingsLink')}
                       </Link>
                     )}
                     {onLogout && (
@@ -287,7 +312,7 @@ export default function AdminLayout({ children, onLogout }: { children: React.Re
                         }}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                       >
-                        Logout
+                        {t('nav.logout')}
                       </button>
                     )}
                   </div>

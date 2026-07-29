@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@kitchenasty/shared": "*",
+    "i18next": "^26.3.6",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
+    "react-i18next": "^17.0.11",
     "react-router-dom": "^6.28.0",
     "recharts": "^3.7.0",
     "socket.io-client": "^4.8.3"

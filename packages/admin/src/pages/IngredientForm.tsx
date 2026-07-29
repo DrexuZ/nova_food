@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api.js';
 
 interface Ingredient {
@@ -18,6 +19,7 @@ interface Ingredient {
 const UNITS = ['KG', 'G', 'L', 'ML', 'UNIDAD', 'DOCENA', 'PAQUETE', 'LITRO', 'KILO', 'GRAMO', 'MILILITRO', 'CAJA', 'BOTELLA', 'LATA', 'PORCION'];
 
 export default function IngredientForm() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
@@ -82,19 +84,19 @@ export default function IngredientForm() {
     }
   };
 
-  if (loading) return <p className="text-gray-500">Loading ingredient...</p>;
+  if (loading) return <p className="text-gray-500">{t('common.loading')}</p>;
 
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-        {isEdit ? 'Edit Ingredient' : 'Add Ingredient'}
+        {isEdit ? t('ingredients.edit') : t('ingredients.new')}
       </h2>
 
-      {error && <p className="text-red-600 mb-4">Error: {error}</p>}
+      {error && <p className="text-red-600 mb-4">{t('common.error')}: {error}</p>}
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('ingredients.name')} *</label>
           <input
             type="text"
             name="name"
@@ -106,7 +108,7 @@ export default function IngredientForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('ingredients.description')}</label>
           <textarea
             name="description"
             value={form.description}
@@ -118,7 +120,7 @@ export default function IngredientForm() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('ingredients.unit')}</label>
             <select
               name="unit"
               value={form.unit}
@@ -129,13 +131,13 @@ export default function IngredientForm() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('ingredients.category')}</label>
             <input
               type="text"
               name="category"
               value={form.category}
               onChange={handleChange}
-              placeholder="e.g. Carnes, Verduras"
+              placeholder={t('ingredients.categoryPlaceholder')}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
@@ -143,7 +145,7 @@ export default function IngredientForm() {
 
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('ingredients.stock')}</label>
             <input
               type="number"
               name="stock"
@@ -155,7 +157,7 @@ export default function IngredientForm() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Min Stock (Alert)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('ingredients.minStock')}</label>
             <input
               type="number"
               name="minStock"
@@ -167,7 +169,7 @@ export default function IngredientForm() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('ingredients.cost')} ($)</label>
             <input
               type="number"
               name="cost"
@@ -189,7 +191,7 @@ export default function IngredientForm() {
             id="isActive"
             className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
           />
-          <label htmlFor="isActive" className="text-sm text-gray-700">Active</label>
+          <label htmlFor="isActive" className="text-sm text-gray-700">{t('ingredients.active')}</label>
         </div>
 
         <div className="flex gap-3 pt-4">
@@ -198,14 +200,14 @@ export default function IngredientForm() {
             disabled={saving}
             className="bg-primary-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
           >
-            {saving ? 'Saving...' : isEdit ? 'Update Ingredient' : 'Create Ingredient'}
+            {saving ? t('common.saving') : isEdit ? t('ingredients.update') : t('ingredients.create')}
           </button>
           <button
             type="button"
             onClick={() => navigate('/inventory/ingredients')}
             className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </form>

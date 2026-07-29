@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsAdvanced() {
+  const { t } = useTranslation();
   const token = localStorage.getItem('token') || '';
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -39,29 +41,29 @@ export default function SettingsAdvanced() {
       });
       const data = await res.json();
       if (data.success) {
-        setSuccess('Advanced settings updated');
+        setSuccess(t('settingsAdvanced.updated'));
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError(typeof data.error === 'string' ? data.error : 'Failed to save');
+        setError(typeof data.error === 'string' ? data.error : t('common.failedToSave'));
       }
     } catch {
-      setError('Network error');
+      setError(t('common.networkError'));
     } finally {
       setSaving(false);
     }
   }
 
-  if (loading) return <div className="p-6 text-gray-500">Loading...</div>;
+  if (loading) return <div className="p-6 text-gray-500">{t('common.loading')}</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <Link to="/settings" className="text-sm text-primary-600 hover:text-primary-700">&larr; Back to Settings</Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-1">Advanced Settings</h1>
+          <Link to="/settings" className="text-sm text-primary-600 hover:text-primary-700">{t('settingsAdvanced.back')}</Link>
+          <h1 className="text-2xl font-bold text-gray-900 mt-1">{t('settingsAdvanced.title')}</h1>
         </div>
         <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50">
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? t('common.saving') : t('common.saveChanges')}
         </button>
       </div>
 
@@ -72,29 +74,29 @@ export default function SettingsAdvanced() {
         <div>
           <label className="flex items-center gap-3">
             <input type="checkbox" checked={maintenanceMode} onChange={(e) => setMaintenanceMode(e.target.checked)} className="w-4 h-4 text-primary-600 rounded" />
-            <span className="text-sm font-medium text-gray-700">Maintenance Mode</span>
+            <span className="text-sm font-medium text-gray-700">{t('settingsAdvanced.maintenanceMode')}</span>
           </label>
           {maintenanceMode && (
             <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-700 font-medium">Warning: The storefront will be unavailable to customers while maintenance mode is enabled.</p>
+              <p className="text-sm text-red-700 font-medium">{t('settingsAdvanced.maintenanceWarning')}</p>
             </div>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Maintenance Message</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('settingsAdvanced.maintenanceMessage')}</label>
           <textarea
             value={maintenanceMessage}
             onChange={(e) => setMaintenanceMessage(e.target.value)}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            placeholder="We're currently performing maintenance. Please check back soon."
+            placeholder={t('settingsAdvanced.maintenancePlaceholder')}
           />
         </div>
 
         <label className="flex items-center gap-3">
           <input type="checkbox" checked={enableRateLimiting} onChange={(e) => setEnableRateLimiting(e.target.checked)} className="w-4 h-4 text-primary-600 rounded" />
-          <span className="text-sm font-medium text-gray-700">Enable rate limiting</span>
+          <span className="text-sm font-medium text-gray-700">{t('settingsAdvanced.rateLimiting')}</span>
         </label>
       </div>
     </div>

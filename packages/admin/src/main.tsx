@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n/index.js';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
 import AdminLayout from './components/AdminLayout.js';
 import ErrorBoundary from './components/ErrorBoundary.js';
@@ -160,11 +162,13 @@ function AppRoutes() {
 function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </BrowserRouter>
+      <I18nextProvider i18n={i18n}>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </BrowserRouter>
+      </I18nextProvider>
     </ErrorBoundary>
   );
 }

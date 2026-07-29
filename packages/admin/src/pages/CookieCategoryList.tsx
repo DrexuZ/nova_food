@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface CookieCategory {
   id: string;
@@ -13,6 +14,7 @@ interface CookieCategory {
 const emptyForm = { name: '', label: '', description: '', isRequired: false, isActive: true, sortOrder: 0 };
 
 export default function CookieCategoryList() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<CookieCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
@@ -65,7 +67,7 @@ export default function CookieCategoryList() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this cookie category?')) return;
+    if (!confirm(t('cookieCategories.deleteConfirm'))) return;
     try {
       const res = await fetch(`/api/legal/cookie-categories/${id}`, {
         method: 'DELETE',
@@ -89,17 +91,17 @@ export default function CookieCategoryList() {
     setShowForm(true);
   }
 
-  if (loading) return <div className="p-6 text-gray-500">Loading...</div>;
+  if (loading) return <div className="p-6 text-gray-500">{t('common.loading')}</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Cookie Categories</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('cookieCategories.title')}</h1>
         <button
           onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(!showForm); }}
           className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700"
         >
-          {showForm ? 'Cancel' : 'Add Category'}
+          {showForm ? t('common.cancel') : t('cookieCategories.addCategory')}
         </button>
       </div>
 
@@ -110,30 +112,30 @@ export default function CookieCategoryList() {
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name (slug)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('cookieCategories.name')}</label>
               <input
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                placeholder="e.g. analytics"
+                placeholder={t('cookieCategories.namePlaceholder')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('cookieCategories.label')}</label>
               <input
                 type="text"
                 value={form.label}
                 onChange={(e) => setForm({ ...form, label: e.target.value })}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                placeholder="e.g. Analytics Cookies"
+                placeholder={t('cookieCategories.labelPlaceholder')}
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('cookieCategories.description')}</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -150,7 +152,7 @@ export default function CookieCategoryList() {
                 onChange={(e) => setForm({ ...form, isRequired: e.target.checked })}
                 className="h-4 w-4 rounded border-gray-300 text-primary-600"
               />
-              Required (cannot be disabled by user)
+              {t('cookieCategories.required')}
             </label>
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -159,10 +161,10 @@ export default function CookieCategoryList() {
                 onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
                 className="h-4 w-4 rounded border-gray-300 text-primary-600"
               />
-              Active
+              {t('common.active')}
             </label>
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Sort Order</label>
+              <label className="text-sm font-medium text-gray-700">{t('cookieCategories.sortOrder')}</label>
               <input
                 type="number"
                 value={form.sortOrder}
@@ -176,7 +178,7 @@ export default function CookieCategoryList() {
               type="submit"
               className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700"
             >
-              {editingId ? 'Update' : 'Create'}
+              {editingId ? t('cookieCategories.update') : t('cookieCategories.create')}
             </button>
           </div>
         </form>
@@ -186,11 +188,11 @@ export default function CookieCategoryList() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
             <tr>
-              <th className="px-6 py-3 text-left">Name</th>
-              <th className="px-6 py-3 text-left">Label</th>
-              <th className="px-6 py-3 text-left">Description</th>
-              <th className="px-6 py-3 text-center">Required</th>
-              <th className="px-6 py-3 text-center">Active</th>
+              <th className="px-6 py-3 text-left">{t('cookieCategories.nameCol')}</th>
+              <th className="px-6 py-3 text-left">{t('cookieCategories.labelCol')}</th>
+              <th className="px-6 py-3 text-left">{t('cookieCategories.descriptionCol')}</th>
+              <th className="px-6 py-3 text-center">{t('cookieCategories.requiredCol')}</th>
+              <th className="px-6 py-3 text-center">{t('cookieCategories.activeCol')}</th>
               <th className="px-6 py-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -202,16 +204,16 @@ export default function CookieCategoryList() {
                 <td className="px-6 py-4 text-gray-500 max-w-xs truncate">{cat.description}</td>
                 <td className="px-6 py-4 text-center">
                   {cat.isRequired ? (
-                    <span className="text-green-600 font-medium">Yes</span>
+                    <span className="text-green-600 font-medium">{t('common.yes')}</span>
                   ) : (
-                    <span className="text-gray-400">No</span>
+                    <span className="text-gray-400">{t('common.no')}</span>
                   )}
                 </td>
                 <td className="px-6 py-4 text-center">
                   {cat.isActive ? (
-                    <span className="text-green-600 font-medium">Yes</span>
+                    <span className="text-green-600 font-medium">{t('common.yes')}</span>
                   ) : (
-                    <span className="text-red-500">No</span>
+                    <span className="text-red-500">{t('common.no')}</span>
                   )}
                 </td>
                 <td className="px-6 py-4 text-right space-x-3">
@@ -219,13 +221,13 @@ export default function CookieCategoryList() {
                     onClick={() => startEdit(cat)}
                     className="text-primary-600 hover:text-primary-700 font-medium"
                   >
-                    Edit
+                    {t('common.edit')}
                   </button>
                   <button
                     onClick={() => handleDelete(cat.id)}
                     className="text-red-500 hover:text-red-600 font-medium"
                   >
-                    Delete
+                    {t('common.delete')}
                   </button>
                 </td>
               </tr>
@@ -233,7 +235,7 @@ export default function CookieCategoryList() {
             {categories.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                  No cookie categories yet.
+                  {t('cookieCategories.empty')}
                 </td>
               </tr>
             )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface Reservation {
   id: string;
@@ -29,6 +30,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function ReservationList() {
+  const { t } = useTranslation();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
@@ -82,7 +84,7 @@ export default function ReservationList() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Reservations</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('reservations.title')}</h1>
       </div>
 
       {/* Filters */}
@@ -91,35 +93,35 @@ export default function ReservationList() {
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-          aria-label="Filter by status"
+          aria-label={t('reservations.filterStatus')}
         >
-          <option value="">All Statuses</option>
-          <option value="PENDING">Pending</option>
-          <option value="CONFIRMED">Confirmed</option>
-          <option value="SEATED">Seated</option>
-          <option value="COMPLETED">Completed</option>
-          <option value="CANCELLED">Cancelled</option>
+          <option value="">{t('reservations.allStatuses')}</option>
+          <option value="PENDING">{t('reservations.statusPending')}</option>
+          <option value="CONFIRMED">{t('reservations.statusConfirmed')}</option>
+          <option value="SEATED">{t('reservations.statusSeated')}</option>
+          <option value="COMPLETED">{t('reservations.statusCompleted')}</option>
+          <option value="CANCELLED">{t('reservations.statusCancelled')}</option>
         </select>
         <input
           type="date"
           value={dateFilter}
           onChange={(e) => { setDateFilter(e.target.value); setPage(1); }}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-          aria-label="Filter by date"
+          aria-label={t('reservations.filterDate')}
         />
         {dateFilter && (
           <button
             onClick={() => { setDateFilter(''); setPage(1); }}
             className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700"
           >
-            Clear date
+            {t('reservations.clearDate')}
           </button>
         )}
       </div>
 
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label="Loading" />
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label={t('common.loading')} />
         </div>
       )}
 
@@ -128,7 +130,7 @@ export default function ReservationList() {
       )}
 
       {!loading && !error && reservations.length === 0 && (
-        <p className="text-gray-500 text-center py-12">No reservations found.</p>
+        <p className="text-gray-500 text-center py-12">{t('reservations.empty')}</p>
       )}
 
       {!loading && reservations.length > 0 && (
@@ -137,11 +139,11 @@ export default function ReservationList() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Date & Time</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Customer</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Party Size</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Table</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('reservations.dateTime')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('reservations.customer')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('reservations.partySize')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('reservations.table')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('reservations.status')}</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Actions</th>
                 </tr>
               </thead>
@@ -158,12 +160,12 @@ export default function ReservationList() {
                       <div className="text-gray-900">{r.customer.name}</div>
                       <div className="text-xs text-gray-500">{r.customer.email}</div>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{r.partySize} guests</td>
+                    <td className="px-4 py-3 text-gray-600">{r.partySize} {t('reservations.guests')}</td>
                     <td className="px-4 py-3">
                       {r.table ? (
                         <span className="text-gray-900">{r.table.name} (seats {r.table.capacity})</span>
                       ) : (
-                        <span className="text-gray-400">Unassigned</span>
+                        <span className="text-gray-400">{t('reservations.unassigned')}</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
@@ -177,43 +179,43 @@ export default function ReservationList() {
                           <button
                             onClick={() => updateStatus(r.id, 'CONFIRMED')}
                             className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
-                            aria-label={`Confirm reservation for ${r.customer.name}`}
+                            aria-label={t('reservations.confirmLabel', { name: r.customer.name })}
                           >
-                            Confirm
+                            {t('reservations.confirm')}
                           </button>
                         )}
                         {r.status === 'CONFIRMED' && (
                           <button
                             onClick={() => updateStatus(r.id, 'SEATED')}
                             className="text-xs px-2 py-1 bg-purple-50 text-purple-700 rounded hover:bg-purple-100"
-                            aria-label={`Seat reservation for ${r.customer.name}`}
+                            aria-label={t('reservations.seatLabel', { name: r.customer.name })}
                           >
-                            Seat
+                            {t('reservations.seat')}
                           </button>
                         )}
                         {r.status === 'SEATED' && (
                           <button
                             onClick={() => updateStatus(r.id, 'COMPLETED')}
                             className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded hover:bg-green-100"
-                            aria-label={`Complete reservation for ${r.customer.name}`}
+                            aria-label={t('reservations.completeLabel', { name: r.customer.name })}
                           >
-                            Complete
+                            {t('reservations.complete')}
                           </button>
                         )}
                         {!['COMPLETED', 'CANCELLED'].includes(r.status) && (
                           <button
                             onClick={() => updateStatus(r.id, 'CANCELLED')}
                             className="text-xs px-2 py-1 bg-red-50 text-red-700 rounded hover:bg-red-100"
-                            aria-label={`Cancel reservation for ${r.customer.name}`}
+                            aria-label={t('reservations.cancelLabel', { name: r.customer.name })}
                           >
-                            Cancel
+                            {t('reservations.cancel')}
                           </button>
                         )}
                         <Link
                           to={`/reservations/${r.id}`}
                           className="text-xs px-2 py-1 text-primary-600 hover:text-primary-700"
                         >
-                          Details
+                          {t('reservations.details')}
                         </Link>
                       </div>
                     </td>
@@ -230,17 +232,17 @@ export default function ReservationList() {
                 onClick={() => setPage((p) => p - 1)}
                 className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50"
               >
-                Previous
+                {t('common.previous')}
               </button>
               <span className="text-sm text-gray-600">
-                Page {pagination.page} of {pagination.totalPages}
+                {t('common.pageOf', { page: pagination.page, total: pagination.totalPages })}
               </span>
               <button
                 disabled={page >= pagination.totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50"
               >
-                Next
+                {t('common.next')}
               </button>
             </div>
           )}

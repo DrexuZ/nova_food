@@ -1,22 +1,21 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface TemplateDef {
   id: string;
-  name: string;
-  description: string;
 }
 
 const templates: TemplateDef[] = [
-  { id: 'classic', name: 'Classic', description: 'Clean gradient hero, 3-column features, simple CTA' },
-  { id: 'elegant', name: 'Elegant', description: 'Centered header, full-image hero with overlay, icon-card features' },
-  { id: 'bold', name: 'Bold', description: 'Large bold typography, split hero, horizontal feature strip' },
-  { id: 'minimal', name: 'Minimal', description: 'Ultra-clean, text-only hero, simple list features' },
-  { id: 'cozy', name: 'Cozy', description: 'Rounded warm feel, card-based hero, rounded feature cards' },
-  { id: 'modern', name: 'Modern', description: 'Glass header, asymmetric hero, grid features, geometric CTA' },
-  { id: 'rustic', name: 'Rustic', description: 'Earthy warm header, textured hero, earthy feature cards' },
-  { id: 'vibrant', name: 'Vibrant', description: 'Gradient header, animated gradient hero, colorful feature cards' },
-  { id: 'sleek', name: 'Sleek', description: 'Dark header, dark hero with glow effects, dark feature cards' },
-  { id: 'retro', name: 'Retro', description: 'Vintage-style header, retro hero with badges, nostalgic CTA' },
+  { id: 'classic' },
+  { id: 'elegant' },
+  { id: 'bold' },
+  { id: 'minimal' },
+  { id: 'cozy' },
+  { id: 'modern' },
+  { id: 'rustic' },
+  { id: 'vibrant' },
+  { id: 'sleek' },
+  { id: 'retro' },
 ];
 
 /* ── Miniature CSS previews ─────────────────────────────────── */
@@ -295,6 +294,7 @@ const previewComponents: Record<string, React.FC> = {
 /* ── Main page ──────────────────────────────────────────────── */
 
 export default function DesignTemplates() {
+  const { t } = useTranslation();
   const token = localStorage.getItem('token') || '';
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -327,26 +327,26 @@ export default function DesignTemplates() {
       const data = await res.json();
       if (data.success) {
         setCurrent(id);
-        setSuccess(`Template "${templates.find((t) => t.id === id)?.name}" applied successfully`);
+        setSuccess(t('templates.applied', { name: t(`templates.${id}`) }));
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError(typeof data.error === 'string' ? data.error : 'Failed to apply template');
+        setError(typeof data.error === 'string' ? data.error : t('templates.applyFailed'));
       }
     } catch {
-      setError('Network error');
+      setError(t('common.networkError'));
     } finally {
       setSaving(null);
     }
   }
 
-  if (loading) return <div className="p-6 text-gray-500">Loading...</div>;
+  if (loading) return <div className="p-6 text-gray-500">{t('common.loading')}</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Templates</h1>
-          <p className="text-sm text-gray-500 mt-1">Choose a storefront layout template. This changes the header, hero, features, CTA, and footer style.</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('templates.title')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('templates.subtitle')}</p>
         </div>
       </div>
 
@@ -389,12 +389,12 @@ export default function DesignTemplates() {
               {/* Info */}
               <div className="p-3">
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-sm font-semibold text-gray-900">{tpl.name}</h3>
+                  <h3 className="text-sm font-semibold text-gray-900">{t(`templates.${tpl.id}`)}</h3>
                   {isActive && (
-                    <span className="text-[10px] font-medium text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded-full">Active</span>
+                    <span className="text-[10px] font-medium text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded-full">{t('templates.active')}</span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed mb-3">{tpl.description}</p>
+                <p className="text-xs text-gray-500 leading-relaxed mb-3">{t(`templates.desc${tpl.id.charAt(0).toUpperCase() + tpl.id.slice(1)}`)}</p>
                 <button
                   onClick={() => handleApply(tpl.id)}
                   disabled={isActive || isSaving}
@@ -404,7 +404,7 @@ export default function DesignTemplates() {
                       : 'bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50'
                   }`}
                 >
-                  {isSaving ? 'Applying...' : isActive ? 'Current Template' : 'Apply Template'}
+                  {isSaving ? t('templates.applying') : isActive ? t('templates.current') : t('templates.apply')}
                 </button>
               </div>
             </div>

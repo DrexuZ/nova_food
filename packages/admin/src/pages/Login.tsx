@@ -1,10 +1,12 @@
 import { useState, FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   onLogin: (token: string) => void;
 }
 
 export default function Login({ onLogin }: Props) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,9 +27,9 @@ export default function Login({ onLogin }: Props) {
       const text = await res.text();
       console.log('[Login] body length:', text.length);
       console.log('[Login] body preview:', text.substring(0, 300));
-      if (!text) throw new Error('Empty response from /api/auth/staff/login');
+      if (!text) throw new Error(t('login.emptyResponse'));
       const data = JSON.parse(text);
-      if (!res.ok) throw new Error(data.error || 'Login failed');
+      if (!res.ok) throw new Error(data.error || t('login.failed'));
       onLogin(data.data.token);
     } catch (err: any) {
       console.error('[Login] error:', err.message);
@@ -42,18 +44,18 @@ export default function Login({ onLogin }: Props) {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-primary-400">KitchenAsty</h1>
-          <p className="text-gray-400 mt-1 text-sm">Admin Panel</p>
+          <p className="text-gray-400 mt-1 text-sm">{t('common.adminPanel')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-8 space-y-5">
-          <h2 className="text-xl font-semibold text-gray-900 text-center">Sign In</h2>
+          <h2 className="text-xl font-semibold text-gray-900 text-center">{t('login.signIn')}</h2>
 
           {error && (
             <div className="bg-red-50 text-red-700 text-sm p-3 rounded-lg">{error}</div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('login.email')}</label>
             <input
               type="email"
               value={email}
@@ -65,7 +67,7 @@ export default function Login({ onLogin }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('login.password')}</label>
             <input
               type="password"
               value={password}
@@ -80,7 +82,7 @@ export default function Login({ onLogin }: Props) {
             disabled={loading}
             className="w-full bg-primary-600 text-white py-2.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? t('login.signingIn') : t('login.signIn')}
           </button>
         </form>
       </div>

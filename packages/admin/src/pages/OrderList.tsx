@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface Order {
   id: string;
@@ -34,6 +35,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function OrderList() {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,7 +70,7 @@ export default function OrderList() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('orders.title')}</h1>
       </div>
 
       {/* Filters */}
@@ -77,33 +79,33 @@ export default function OrderList() {
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-          aria-label="Filter by status"
+          aria-label={t('orders.filterStatus')}
         >
-          <option value="">All Statuses</option>
-          <option value="PENDING">Pending</option>
-          <option value="CONFIRMED">Confirmed</option>
-          <option value="PREPARING">Preparing</option>
-          <option value="READY">Ready</option>
-          <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
-          <option value="DELIVERED">Delivered</option>
-          <option value="PICKED_UP">Picked Up</option>
-          <option value="CANCELLED">Cancelled</option>
+          <option value="">{t('orders.allStatuses')}</option>
+          <option value="PENDING">{t('orders.statusPending')}</option>
+          <option value="CONFIRMED">{t('orders.statusConfirmed')}</option>
+          <option value="PREPARING">{t('orders.statusPreparing')}</option>
+          <option value="READY">{t('orders.statusReady')}</option>
+          <option value="OUT_FOR_DELIVERY">{t('orders.statusOutForDelivery')}</option>
+          <option value="DELIVERED">{t('orders.statusDelivered')}</option>
+          <option value="PICKED_UP">{t('orders.statusPickedUp')}</option>
+          <option value="CANCELLED">{t('orders.statusCancelled')}</option>
         </select>
         <select
           value={typeFilter}
           onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-          aria-label="Filter by order type"
+          aria-label={t('orders.filterType')}
         >
-          <option value="">All Types</option>
-          <option value="DELIVERY">Delivery</option>
-          <option value="PICKUP">Pickup</option>
+          <option value="">{t('orders.allTypes')}</option>
+          <option value="DELIVERY">{t('orders.typeDelivery')}</option>
+          <option value="PICKUP">{t('orders.typePickup')}</option>
         </select>
       </div>
 
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label="Loading" />
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label={t('common.loading')} />
         </div>
       )}
 
@@ -112,7 +114,7 @@ export default function OrderList() {
       )}
 
       {!loading && !error && orders.length === 0 && (
-        <p className="text-gray-500 text-center py-12">No orders found.</p>
+        <p className="text-gray-500 text-center py-12">{t('orders.empty')}</p>
       )}
 
       {!loading && orders.length > 0 && (
@@ -121,14 +123,14 @@ export default function OrderList() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Order #</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Customer</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Type</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Items</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">Total</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Date</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Actions</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('orders.orderCol')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('orders.customer')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('orders.type')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('orders.status')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('orders.items')}</th>
+                  <th className="text-right px-4 py-3 font-medium text-gray-600">{t('orders.total')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('orders.date')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('orders.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,13 +139,13 @@ export default function OrderList() {
                     <td className="px-4 py-3 font-mono text-xs">
                       {order.orderNumber}
                       {order.scheduledAt && (
-                        <span className="ml-1.5 inline-flex items-center text-indigo-600" title={`Scheduled: ${new Date(order.scheduledAt).toLocaleString()}`} aria-label={`Scheduled: ${new Date(order.scheduledAt).toLocaleString()}`}>
+                        <span className="ml-1.5 inline-flex items-center text-indigo-600" title={t('orders.scheduledLabel', { date: new Date(order.scheduledAt).toLocaleString() })} aria-label={t('orders.scheduledLabel', { date: new Date(order.scheduledAt).toLocaleString() })}>
                           &#128339;
                         </span>
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      {order.customer ? order.customer.name : <span className="text-gray-400">Guest</span>}
+                      {order.customer ? order.customer.name : <span className="text-gray-400">{t('orders.guest')}</span>}
                     </td>
                     <td className="px-4 py-3">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${order.orderType === 'DELIVERY' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
@@ -166,7 +168,7 @@ export default function OrderList() {
                         to={`/orders/${order.id}`}
                         className="text-primary-600 hover:text-primary-700 text-xs font-medium"
                       >
-                        View
+                        {t('orders.view')}
                       </Link>
                     </td>
                   </tr>
@@ -183,17 +185,17 @@ export default function OrderList() {
                 onClick={() => setPage((p) => p - 1)}
                 className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50"
               >
-                Previous
+                {t('common.previous')}
               </button>
               <span className="text-sm text-gray-600">
-                Page {pagination.page} of {pagination.totalPages}
+                {t('common.pageOf', { page: pagination.page, total: pagination.totalPages })}
               </span>
               <button
                 disabled={page >= pagination.totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50"
               >
-                Next
+                {t('common.next')}
               </button>
             </div>
           )}

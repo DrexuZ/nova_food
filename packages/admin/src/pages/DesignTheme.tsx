@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 function hexToHsl(hex: string): [number, number, number] {
   const r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -45,6 +46,7 @@ function generatePalette(hex: string): Record<string, string> {
 }
 
 export default function DesignTheme() {
+  const { t } = useTranslation();
   const token = localStorage.getItem('token') || '';
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -81,13 +83,13 @@ export default function DesignTheme() {
       });
       const data = await res.json();
       if (data.success) {
-        setSuccess('Theme updated successfully');
+        setSuccess(t('theme.updated'));
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError(typeof data.error === 'string' ? data.error : 'Failed to save');
+        setError(typeof data.error === 'string' ? data.error : t('common.failedToSave'));
       }
     } catch {
-      setError('Network error');
+      setError(t('common.networkError'));
     } finally {
       setSaving(false);
     }
@@ -96,18 +98,18 @@ export default function DesignTheme() {
   const primaryPalette = generatePalette(colorPrimary);
   const secondaryPalette = generatePalette(colorSecondary);
 
-  if (loading) return <div className="p-6 text-gray-500">Loading...</div>;
+  if (loading) return <div className="p-6 text-gray-500">{t('common.loading')}</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Theme</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('theme.title')}</h1>
         <button
           onClick={handleSave}
           disabled={saving}
           className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
         >
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? t('common.saving') : t('common.saveChanges')}
         </button>
       </div>
 
@@ -120,10 +122,10 @@ export default function DesignTheme() {
 
       {/* Colors */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Colors</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('theme.colors')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('theme.primary')}</label>
             <div className="flex items-center gap-3">
               <input
                 type="color"
@@ -150,7 +152,7 @@ export default function DesignTheme() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Secondary Color</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('theme.secondary')}</label>
             <div className="flex items-center gap-3">
               <input
                 type="color"
@@ -181,7 +183,7 @@ export default function DesignTheme() {
 
       {/* Dark Mode */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Dark Mode</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('theme.darkMode')}</h2>
         <div className="flex gap-4">
           {(['light', 'dark', 'system'] as const).map((mode) => (
             <label
@@ -203,12 +205,12 @@ export default function DesignTheme() {
               <span className="text-lg">
                 {mode === 'light' ? '☀️' : mode === 'dark' ? '🌙' : '💻'}
               </span>
-              <span className="text-sm font-medium text-gray-700 capitalize">{mode}</span>
+              <span className="text-sm font-medium text-gray-700 capitalize">{t(`theme.${mode}`)}</span>
             </label>
           ))}
         </div>
         <p className="mt-3 text-xs text-gray-500">
-          Controls the default appearance of the storefront. "System" follows the visitor's OS preference.
+          {t('theme.helperText')}
         </p>
       </div>
     </div>

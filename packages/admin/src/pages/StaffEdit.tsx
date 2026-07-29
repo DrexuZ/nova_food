@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface Staff {
   id: string;
@@ -18,6 +19,7 @@ interface Location {
 }
 
 export default function StaffEdit() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -40,7 +42,7 @@ export default function StaffEdit() {
       fetch('/api/locations?limit=100', { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
     ])
       .then(([staffData, locData]) => {
-        if (!staffData.success) throw new Error(staffData.error || 'Failed to load staff');
+        if (!staffData.success) throw new Error(staffData.error || t('staff.failedToLoad'));
         const s = staffData.data;
         setStaff(s);
         setName(s.name);
@@ -72,7 +74,7 @@ export default function StaffEdit() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to update');
+      if (!res.ok) throw new Error(data.error || t('staff.failedToUpdate'));
       navigate('/staff');
     } catch (err: any) {
       setError(err.message);
@@ -84,22 +86,22 @@ export default function StaffEdit() {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label={t('common.loading')} />
       </div>
     );
   }
 
   if (!staff) {
-    return <div className="bg-red-50 text-red-700 p-4 rounded-lg">{error || 'Staff not found'}</div>;
+    return <div className="bg-red-50 text-red-700 p-4 rounded-lg">{error || t('staff.notFound')}</div>;
   }
 
   return (
     <div className="max-w-lg mx-auto">
       <div className="flex items-center gap-3 mb-6">
         <Link to="/staff" className="text-gray-400 hover:text-gray-600">
-          ← Back
+          ← {t('staff.back')}
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Edit Staff</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('staff.edit')}</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
@@ -108,7 +110,7 @@ export default function StaffEdit() {
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('staff.email')}</label>
           <input
             type="email"
             value={staff.email}
@@ -118,7 +120,7 @@ export default function StaffEdit() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('staff.name')}</label>
           <input
             type="text"
             value={name}
@@ -129,20 +131,20 @@ export default function StaffEdit() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('staff.role')}</label>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
           >
-            <option value="STAFF">Staff</option>
-            <option value="MANAGER">Manager</option>
-            <option value="SUPER_ADMIN">Super Admin</option>
+            <option value="STAFF">{t('role.staff')}</option>
+            <option value="MANAGER">{t('role.manager')}</option>
+            <option value="SUPER_ADMIN">{t('role.superAdmin')}</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('staff.phone')}</label>
           <input
             type="text"
             value={phone}
@@ -152,13 +154,13 @@ export default function StaffEdit() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('staff.location')}</label>
           <select
             value={locationId}
             onChange={(e) => setLocationId(e.target.value)}
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
           >
-            <option value="">None</option>
+            <option value="">{t('staff.locationNone')}</option>
             {locations.map((loc) => (
               <option key={loc.id} value={loc.id}>{loc.name}</option>
             ))}
@@ -173,7 +175,7 @@ export default function StaffEdit() {
             onChange={(e) => setIsActive(e.target.checked)}
             className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
           />
-          <label htmlFor="isActive" className="text-sm text-gray-700">Active</label>
+          <label htmlFor="isActive" className="text-sm text-gray-700">{t('staff.active')}</label>
         </div>
 
         <button
@@ -181,7 +183,7 @@ export default function StaffEdit() {
           disabled={saving}
           className="w-full bg-primary-600 text-white py-2.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
         >
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? t('common.saving') : t('common.saveChanges')}
         </button>
       </form>
     </div>

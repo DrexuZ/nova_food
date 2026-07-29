@@ -1,7 +1,9 @@
 import { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function StaffInvite() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState('STAFF');
@@ -23,7 +25,7 @@ export default function StaffInvite() {
         body: JSON.stringify({ email, name: name || undefined, role }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to send invite');
+      if (!res.ok) throw new Error(data.error || t('staffInvite.failed'));
       setSuccess(true);
     } catch (err: any) {
       setError(err.message);
@@ -47,22 +49,22 @@ export default function StaffInvite() {
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl text-green-600">✓</span>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Invitation Sent!</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('staffInvite.success')}</h2>
           <p className="text-gray-600 mb-6">
-            An invitation has been sent to <strong>{email}</strong>. They have 7 days to accept.
+            {t('staffInvite.sentTo')} <strong>{email}</strong>
           </p>
           <div className="flex gap-3 justify-center">
             <button
               onClick={handleInviteAnother}
               className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
             >
-              Invite Another
+              {t('staffInvite.inviteAnother')}
             </button>
             <Link
               to="/staff"
               className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
             >
-              Back to Staff
+              {t('staffInvite.back')}
             </Link>
           </div>
         </div>
@@ -74,7 +76,7 @@ export default function StaffInvite() {
     <div className="max-w-lg mx-auto">
       <div className="flex items-center gap-3 mb-6">
         <Link to="/staff" className="text-gray-400 hover:text-gray-600">
-          ← Back
+          ← {t('staff.back')}
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">Invite Staff</h1>
       </div>
@@ -85,7 +87,7 @@ export default function StaffInvite() {
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('staffInvite.email')} *</label>
           <input
             type="email"
             value={email}
@@ -97,7 +99,7 @@ export default function StaffInvite() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name (optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('staffInvite.nameOptional')}</label>
           <input
             type="text"
             value={name}
@@ -107,15 +109,15 @@ export default function StaffInvite() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t('staffInvite.role')}</label>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
           >
-            <option value="STAFF">Staff</option>
-            <option value="MANAGER">Manager</option>
-            <option value="SUPER_ADMIN">Super Admin</option>
+            <option value="STAFF">{t('role.staff')}</option>
+            <option value="MANAGER">{t('role.manager')}</option>
+            <option value="SUPER_ADMIN">{t('role.superAdmin')}</option>
           </select>
         </div>
 
@@ -124,7 +126,7 @@ export default function StaffInvite() {
           disabled={loading}
           className="w-full bg-primary-600 text-white py-2.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
         >
-          {loading ? 'Sending...' : 'Send Invitation'}
+          {loading ? t('staffInvite.sending') : t('staffInvite.send')}
         </button>
       </form>
     </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api.js';
+import { useTranslation } from 'react-i18next';
 
 interface AutomationRule {
   id: string;
@@ -20,6 +21,7 @@ const EVENT_LABELS: Record<string, string> = {
 };
 
 export default function AutomationRuleList() {
+  const { t } = useTranslation();
   const [rules, setRules] = useState<AutomationRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -43,7 +45,7 @@ export default function AutomationRuleList() {
   };
 
   const deleteRule = async (id: string) => {
-    if (!confirm('Delete this automation rule?')) return;
+    if (!confirm(t('automation.deleteConfirm'))) return;
     try {
       await api.delete(`/automation-rules/${id}`);
       setRules((prev) => prev.filter((r) => r.id !== id));
@@ -55,12 +57,12 @@ export default function AutomationRuleList() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Automation Rules</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('automation.title')}</h1>
         <Link
           to="/automation/new"
           className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
-          Add Rule
+          {t('automation.addRule')}
         </Link>
       </div>
 
@@ -68,15 +70,15 @@ export default function AutomationRuleList() {
 
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label="Loading" />
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label={t('common.loading')} />
         </div>
       )}
 
       {!loading && rules.length === 0 && (
         <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 mb-4">No automation rules yet.</p>
+          <p className="text-gray-500 mb-4">{t('automation.noRules')}</p>
           <Link to="/automation/new" className="text-primary-600 hover:text-primary-700 font-medium">
-            Create your first rule
+            {t('automation.createFirst')}
           </Link>
         </div>
       )}
@@ -86,11 +88,11 @@ export default function AutomationRuleList() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Name</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Event</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Actions</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-600">Actions</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">{t('automation.name')}</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">{t('automation.event')}</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">{t('automation.actions')}</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">{t('automation.status')}</th>
+                <th className="text-right px-4 py-3 font-medium text-gray-600">{t('automation.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -118,7 +120,7 @@ export default function AutomationRuleList() {
                         }`}
                       aria-label={`${rule.isActive ? 'Deactivate' : 'Activate'} rule ${rule.name}`}
                     >
-                      {rule.isActive ? 'Active' : 'Inactive'}
+                      {rule.isActive ? t('common.active') : t('common.inactive')}
                     </button>
                   </td>
                   <td className="px-4 py-3 text-right space-x-2">
@@ -127,14 +129,14 @@ export default function AutomationRuleList() {
                       className="text-primary-600 hover:text-primary-700 text-xs font-medium"
                       aria-label={`Edit rule ${rule.name}`}
                     >
-                      Edit
+                      {t('common.edit')}
                     </Link>
                     <button
                       onClick={() => deleteRule(rule.id)}
                       className="text-red-600 hover:text-red-700 text-xs font-medium"
                       aria-label={`Delete rule ${rule.name}`}
                     >
-                      Delete
+                      {t('common.delete')}
                     </button>
                   </td>
                 </tr>

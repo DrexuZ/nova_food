@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api.js';
 
 interface Ingredient {
@@ -26,6 +27,7 @@ interface RecipeIngredientEntry {
 const UNITS = ['KG', 'G', 'L', 'ML', 'UNIDAD', 'DOCENA', 'PAQUETE', 'LITRO', 'KILO', 'GRAMO', 'MILILITRO', 'CAJA', 'BOTELLA', 'LATA', 'PORCION'];
 
 export default function RecipeForm() {
+  const { t } = useTranslation();
   const { menuItemId } = useParams<{ menuItemId: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -82,8 +84,8 @@ export default function RecipeForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (recipeIngredients.length === 0) { setError('Add at least one ingredient'); return; }
-    if (recipeIngredients.some((ri) => !ri.ingredientId)) { setError('All ingredients must be selected'); return; }
+    if (recipeIngredients.length === 0) { setError(t('recipe.errorAddIngredient')); return; }
+    if (recipeIngredients.some((ri) => !ri.ingredientId)) { setError(t('recipe.errorSelectIngredient')); return; }
     setSaving(true);
     setError(null);
     try {
@@ -105,32 +107,32 @@ export default function RecipeForm() {
     }
   };
 
-  if (loading) return <p className="text-gray-500">Loading...</p>;
-  if (!menuItem) return <p className="text-red-600">Menu item not found</p>;
+  if (loading) return <p className="text-gray-500">{t('common.loading')}</p>;
+  if (!menuItem) return <p className="text-red-600">{t('recipe.notFound')}</p>;
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-2">Recipe: {menuItem.name}</h2>
-      <p className="text-gray-500 mb-6">Define the ingredients needed to prepare this menu item.</p>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-2">{t('recipe.title', { name: menuItem.name })}</h2>
+      <p className="text-gray-500 mb-6">{t('recipe.subheading')}</p>
 
-      {error && <p className="text-red-600 mb-4">Error: {error}</p>}
+      {error && <p className="text-red-600 mb-4">{t('common.error')}: {error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h3 className="font-medium text-gray-800">Recipe Details</h3>
+          <h3 className="font-medium text-gray-800">{t('recipe.details')}</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Recipe Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('recipe.recipeName')}</label>
               <input
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder={`${menuItem.name} recipe`}
+                placeholder={t('recipe.recipeNamePlaceholder', { name: menuItem.name })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Yield (portions)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('recipe.yield')}</label>
               <input
                 type="number"
                 value={form.yield}
@@ -141,7 +143,7 @@ export default function RecipeForm() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Instructions (optional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('recipe.instructions')}</label>
             <textarea
               value={form.instructions}
               onChange={(e) => setForm({ ...form, instructions: e.target.value })}
@@ -153,18 +155,18 @@ export default function RecipeForm() {
 
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium text-gray-800">Ingredients</h3>
+            <h3 className="font-medium text-gray-800">{t('recipe.ingredients')}</h3>
             <button
               type="button"
               onClick={addIngredient}
               className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded text-sm font-medium hover:bg-gray-200 transition-colors"
             >
-              + Add Ingredient
+              + {t('recipe.addIngredient')}
             </button>
           </div>
 
           {recipeIngredients.length === 0 && (
-            <p className="text-gray-400 text-sm py-4 text-center">No ingredients added yet. Click "Add Ingredient" to start.</p>
+            <p className="text-gray-400 text-sm py-4 text-center">{t('recipe.noIngredients')}</p>
           )}
 
           {recipeIngredients.map((ri, idx) => (
@@ -175,7 +177,7 @@ export default function RecipeForm() {
                   onChange={(e) => updateIngredient(idx, 'ingredientId', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
-                  <option value="">Select ingredient...</option>
+                  <option value="">{t('recipe.selectIngredient')}</option>
                   {ingredients.map((ing) => (
                     <option key={ing.id} value={ing.id}>
                       {ing.name} ({ing.stock} {ing.unit})
@@ -206,7 +208,7 @@ export default function RecipeForm() {
                 type="button"
                 onClick={() => removeIngredient(idx)}
                 className="text-red-500 hover:text-red-700 pt-2"
-                aria-label="Remove ingredient"
+                aria-label={t('recipe.removeIngredient')}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -222,14 +224,14 @@ export default function RecipeForm() {
             disabled={saving}
             className="bg-primary-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
           >
-            {saving ? 'Saving...' : 'Save Recipe'}
+            {saving ? t('common.saving') : t('recipe.save')}
           </button>
           <button
             type="button"
             onClick={() => navigate(`/menu/items/${menuItemId}`)}
             className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </form>

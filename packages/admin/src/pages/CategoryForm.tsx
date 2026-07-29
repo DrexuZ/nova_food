@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api.js';
 
 interface CategoryData {
@@ -26,6 +27,7 @@ const emptyCategory: CategoryData = {
 };
 
 export default function CategoryForm() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = !!id;
@@ -95,16 +97,16 @@ export default function CategoryForm() {
     }
   };
 
-  if (loading) return <p className="text-gray-500">Loading...</p>;
+  if (loading) return <p className="text-gray-500">{t('common.loading')}</p>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold text-gray-800">
-          {isEdit ? 'Edit Category' : 'New Category'}
+          {isEdit ? t('category.editCategory') : t('category.newCategory')}
         </h2>
         <button onClick={() => navigate('/menu/categories')} className="text-gray-500 hover:text-gray-700 text-sm">
-          Back to Categories
+          {t('category.back')}
         </button>
       </div>
 
@@ -114,10 +116,10 @@ export default function CategoryForm() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <section className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Category Details</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('category.details')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('category.name')}</label>
               <input
                 type="text"
                 value={form.name}
@@ -127,7 +129,7 @@ export default function CategoryForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('category.slug')}</label>
               <input
                 type="text"
                 value={form.slug}
@@ -138,7 +140,7 @@ export default function CategoryForm() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('category.description')}</label>
               <textarea
                 value={form.description}
                 onChange={(e) => updateField('description', e.target.value)}
@@ -147,20 +149,20 @@ export default function CategoryForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Parent Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('category.parent')}</label>
               <select
                 value={form.parentId}
                 onChange={(e) => updateField('parentId', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
-                <option value="">None (top-level)</option>
+                <option value="">{t('category.parentNone')}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('category.sortOrder')}</label>
               <input
                 type="number"
                 value={form.sortOrder}
@@ -177,7 +179,7 @@ export default function CategoryForm() {
                   onChange={(e) => updateField('isActive', e.target.checked)}
                   className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
-                <span className="text-sm text-gray-700">Active</span>
+                <span className="text-sm text-gray-700">{t('category.active')}</span>
               </label>
             </div>
           </div>
@@ -185,10 +187,10 @@ export default function CategoryForm() {
 
         <div className="flex justify-end gap-3">
           <button type="button" onClick={() => navigate('/menu/categories')} className="px-6 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
-            Cancel
+            {t('common.cancel')}
           </button>
           <button type="submit" disabled={saving} className="px-6 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors">
-            {saving ? 'Saving...' : isEdit ? 'Update Category' : 'Create Category'}
+            {saving ? t('common.saving') : isEdit ? t('category.update') : t('category.create')}
           </button>
         </div>
       </form>

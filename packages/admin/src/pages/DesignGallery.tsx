@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Category = 'FOOD' | 'INTERIOR' | 'GARDEN' | 'EVENTS';
 
@@ -12,13 +13,6 @@ interface GalleryImage {
 }
 
 const CATEGORIES: Category[] = ['FOOD', 'INTERIOR', 'GARDEN', 'EVENTS'];
-
-const CATEGORY_LABELS: Record<Category, string> = {
-  FOOD: 'Food',
-  INTERIOR: 'Interior',
-  GARDEN: 'Garden',
-  EVENTS: 'Events',
-};
 
 interface FormState {
   url: string;
@@ -37,6 +31,7 @@ const emptyForm: FormState = {
 };
 
 export default function DesignGallery() {
+  const { t } = useTranslation();
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -106,7 +101,7 @@ export default function DesignGallery() {
       });
       if (!res.ok) {
         const result = await res.json().catch(() => ({}));
-        throw new Error(result.error?.[0]?.message || 'Save failed');
+        throw new Error(result.error?.[0]?.message || t('gallery.saveFailed'));
       }
       closeForm();
       await load();
@@ -118,10 +113,10 @@ export default function DesignGallery() {
   }
 
   async function remove(img: GalleryImage) {
-    if (!window.confirm(`Delete "${img.alt}"?`)) return;
+    if (!window.confirm(t('gallery.deleteConfirm', { name: img.alt }))) return;
     const res = await fetch(`/api/gallery/${img.id}`, { method: 'DELETE', headers: authHeaders });
     if (res.ok) await load();
-    else setError('Delete failed');
+    else setError(t('gallery.deleteFailed'));
   }
 
   async function toggleActive(img: GalleryImage) {
@@ -139,14 +134,14 @@ export default function DesignGallery() {
     <div>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-800">Gallery</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage photos shown on the storefront gallery page</p>
+          <h2 className="text-2xl font-semibold text-gray-800">{t('gallery.title')}</h2>
+          <p className="text-sm text-gray-500 mt-1">{t('gallery.subtitle')}</p>
         </div>
         <button
           onClick={openCreate}
           className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
-          + Add Image
+          + {t('gallery.addImage')}
         </button>
       </div>
 
@@ -159,7 +154,7 @@ export default function DesignGallery() {
               filter === c ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            {c === 'ALL' ? 'All' : CATEGORY_LABELS[c]}
+            {c === 'ALL' ? t('gallery.all') : t(`gallery.${c.toLowerCase()}`)}
             <span className="ml-1 opacity-70">
               ({c === 'ALL' ? images.length : images.filter((i) => i.category === c).length})
             </span>
@@ -174,7 +169,7 @@ export default function DesignGallery() {
           <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <p className="text-gray-500 text-sm py-8 text-center">No images yet. Click "Add Image" to start.</p>
+        <p className="text-gray-500 text-sm py-8 text-center">{t('gallery.empty')}</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filtered.map((img) => (
@@ -183,32 +178,32 @@ export default function DesignGallery() {
                 <img src={img.url} alt={img.alt} className="w-full h-full object-cover" loading="lazy" />
                 {!img.isActive && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <span className="text-white text-xs font-semibold bg-gray-800 px-2 py-1 rounded">HIDDEN</span>
+                    <span className="text-white text-xs font-semibold bg-gray-800 px-2 py-1 rounded">{t('gallery.hidden')}</span>
                   </div>
                 )}
               </div>
               <div className="p-3">
                 <p className="text-sm font-medium text-gray-900 truncate" title={img.alt}>{img.alt}</p>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-gray-500">{CATEGORY_LABELS[img.category]} · #{img.sortOrder}</span>
+                  <span className="text-xs text-gray-500">{t(`gallery.${img.category.toLowerCase()}`)} · #{img.sortOrder}</span>
                 </div>
                 <div className="flex gap-2 mt-3">
                   <button
                     onClick={() => openEdit(img)}
-                    className="flex-1 text-xs px-2 py-1.5 border border-gray-300 rounded hover:bg-gray-50"
+                      className="flex-1 text-xs px-2 py-1.5 border border-gray-300 rounded hover:bg-gray-50"
                   >
-                    Edit
+                    {t('gallery.editImage')}
                   </button>
                   <button
                     onClick={() => toggleActive(img)}
                     className="flex-1 text-xs px-2 py-1.5 border border-gray-300 rounded hover:bg-gray-50"
                   >
-                    {img.isActive ? 'Hide' : 'Show'}
+                    {img.isActive ? t('gallery.hide') : t('gallery.show')}
                   </button>
                   <button
                     onClick={() => remove(img)}
                     className="text-xs px-2 py-1.5 border border-red-200 text-red-600 rounded hover:bg-red-50"
-                    aria-label={`Delete ${img.alt}`}
+                    aria-label={t('gallery.deleteLabel', { name: img.alt })}
                   >
                     ✕
                   </button>
@@ -224,27 +219,27 @@ export default function DesignGallery() {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full">
             <form onSubmit={save}>
               <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">{editing ? 'Edit Image' : 'Add Image'}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{editing ? t('gallery.editImage') : t('gallery.addImageTitle')}</h3>
               </div>
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('gallery.imageUrl')}</label>
                   <input
                     type="url"
                     required
                     value={form.url}
                     onChange={(e) => setForm({ ...form, url: e.target.value })}
-                    placeholder="https://..."
+                    placeholder={t('gallery.urlPlaceholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
                 {form.url && (
                   <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden">
-                    <img src={form.url} alt="preview" className="w-full h-full object-cover" />
+                    <img src={form.url} alt={t('gallery.preview')} className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Alt text</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('gallery.altText')}</label>
                   <input
                     type="text"
                     required
@@ -256,19 +251,19 @@ export default function DesignGallery() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('gallery.category')}</label>
                     <select
                       value={form.category}
                       onChange={(e) => setForm({ ...form, category: e.target.value as Category })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
                     >
                       {CATEGORIES.map((c) => (
-                        <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
+                        <option key={c} value={c}>{t(`gallery.${c.toLowerCase()}`)}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Sort order</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('gallery.sortOrder')}</label>
                     <input
                       type="number"
                       value={form.sortOrder}
@@ -284,7 +279,7 @@ export default function DesignGallery() {
                     onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
                     className="rounded"
                   />
-                  <span className="text-sm text-gray-700">Visible on storefront</span>
+                  <span className="text-sm text-gray-700">{t('gallery.visible')}</span>
                 </label>
               </div>
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-2 rounded-b-xl">
@@ -294,14 +289,14 @@ export default function DesignGallery() {
                   className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100"
                   disabled={saving}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                   disabled={saving}
                 >
-                  {saving ? 'Saving...' : editing ? 'Save Changes' : 'Add Image'}
+                  {saving ? t('common.saving') : editing ? t('common.saveChanges') : t('gallery.addImage')}
                 </button>
               </div>
             </form>

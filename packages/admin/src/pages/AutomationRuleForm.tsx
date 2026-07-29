@@ -1,12 +1,13 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api.js';
+import { useTranslation } from 'react-i18next';
 
 const EVENTS = [
-  { value: 'order.created', label: 'Order Created' },
-  { value: 'order.statusChanged', label: 'Order Status Changed' },
-  { value: 'reservation.created', label: 'Reservation Created' },
-  { value: 'review.submitted', label: 'Review Submitted' },
+  { value: 'order.created' },
+  { value: 'order.statusChanged' },
+  { value: 'reservation.created' },
+  { value: 'review.submitted' },
 ];
 
 const ACTION_TYPES = ['email', 'webhook', 'sms'];
@@ -20,6 +21,7 @@ interface ActionItem {
 }
 
 export default function AutomationRuleForm() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const isNew = !id || id === 'new';
@@ -70,7 +72,7 @@ export default function AutomationRuleForm() {
         try {
           conditions = JSON.parse(conditionsJson);
         } catch {
-          setError('Invalid JSON for conditions');
+          setError(t('automation.invalidJson'));
           setLoading(false);
           return;
         }
@@ -95,7 +97,7 @@ export default function AutomationRuleForm() {
   return (
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">
-        {isNew ? 'New Automation Rule' : 'Edit Automation Rule'}
+        {isNew ? t('automation.newRule') : t('automation.editRule')}
       </h1>
 
       {error && <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-4">{error}</div>}
@@ -103,40 +105,46 @@ export default function AutomationRuleForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('automation.name')}</label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none text-sm"
-              placeholder="e.g., Send order confirmation email"
+              placeholder={t('automation.namePlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Event</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('automation.event')}</label>
             <select
               value={event}
               onChange={(e) => setEvent(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm"
             >
-              {EVENTS.map((ev) => (
-                <option key={ev.value} value={ev.value}>{ev.label}</option>
-              ))}
+              {EVENTS.map((ev) => {
+                const labels: Record<string, string> = {
+                  'order.created': t('automation.eventOrderCreated'),
+                  'order.statusChanged': t('automation.eventOrderStatusChanged'),
+                  'reservation.created': t('automation.eventReservationCreated'),
+                  'review.submitted': t('automation.eventReviewSubmitted'),
+                };
+                return <option key={ev.value} value={ev.value}>{labels[ev.value]}</option>;
+              })}
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Conditions (JSON, optional)
+              {t('automation.conditions')}
             </label>
             <textarea
               value={conditionsJson}
               onChange={(e) => setConditionsJson(e.target.value)}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none text-sm font-mono"
-              placeholder='e.g., { "order.status": "CONFIRMED" }'
+              placeholder={t('automation.conditionsPlaceholder')}
             />
           </div>
 
@@ -147,20 +155,20 @@ export default function AutomationRuleForm() {
               onChange={(e) => setIsActive(e.target.checked)}
               className="accent-primary-600"
             />
-            <span className="text-sm text-gray-700">Active</span>
+            <span className="text-sm text-gray-700">{t('common.active')}</span>
           </div>
         </div>
 
         {/* Actions */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Actions</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('automation.actions')}</h2>
             <button
               type="button"
               onClick={addAction}
               className="text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
-              + Add Action
+              {t('automation.addAction')}
             </button>
           </div>
 
@@ -183,7 +191,7 @@ export default function AutomationRuleForm() {
                       onClick={() => removeAction(i)}
                       className="text-red-500 hover:text-red-700 text-xs"
                     >
-                      Remove
+                      {t('common.remove')}
                     </button>
                   )}
                 </div>
@@ -192,7 +200,7 @@ export default function AutomationRuleForm() {
                   <>
                     <input
                       type="text"
-                      placeholder="To (e.g., 'customer' or email/phone)"
+                      placeholder={t('automation.to')}
                       value={action.to || ''}
                       onChange={(e) => updateAction(i, 'to', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
@@ -200,14 +208,14 @@ export default function AutomationRuleForm() {
                     {action.type === 'email' && (
                       <input
                         type="text"
-                        placeholder="Subject (supports {{order.orderNumber}})"
+                        placeholder={t('automation.subject')}
                         value={action.subject || ''}
                         onChange={(e) => updateAction(i, 'subject', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
                       />
                     )}
                     <textarea
-                      placeholder="Body (supports {{order.orderNumber}}, {{order.status}})"
+                      placeholder={t('automation.body')}
                       value={action.body || ''}
                       onChange={(e) => updateAction(i, 'body', e.target.value)}
                       rows={3}
@@ -219,7 +227,7 @@ export default function AutomationRuleForm() {
                 {action.type === 'webhook' && (
                   <input
                     type="url"
-                    placeholder="Webhook URL"
+                    placeholder={t('automation.webhookUrl')}
                     value={action.url || ''}
                     onChange={(e) => updateAction(i, 'url', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
@@ -236,14 +244,14 @@ export default function AutomationRuleForm() {
             disabled={loading}
             className="bg-primary-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
           >
-            {loading ? 'Saving...' : isNew ? 'Create Rule' : 'Update Rule'}
+            {loading ? t('common.saving') : isNew ? t('automation.createRule') : t('automation.updateRule')}
           </button>
           <button
             type="button"
             onClick={() => navigate('/automation')}
             className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </form>

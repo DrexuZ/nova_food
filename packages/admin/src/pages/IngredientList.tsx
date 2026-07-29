@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api.js';
 
 interface Ingredient {
@@ -22,6 +23,7 @@ interface IngredientResponse {
 }
 
 export default function IngredientList() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +58,7 @@ export default function IngredientList() {
   }, [search, categoryFilter]);
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Delete ingredient "${name}"?`)) return;
+    if (!confirm(t('ingredients.deleteConfirm', { name }))) return;
     try {
       await api.delete(`/inventory/ingredients/${id}`);
       fetchItems(pagination.page);
@@ -66,57 +68,57 @@ export default function IngredientList() {
   };
 
   const stockStatus = (item: Ingredient) => {
-    if (item.stock <= 0) return { label: 'Out of Stock', cls: 'bg-red-100 text-red-800' };
-    if (item.minStock > 0 && item.stock <= item.minStock) return { label: 'Low Stock', cls: 'bg-yellow-100 text-yellow-800' };
-    return { label: 'In Stock', cls: 'bg-green-100 text-green-800' };
+    if (item.stock <= 0) return { label: t('ingredients.outOfStock'), cls: 'bg-red-100 text-red-800' };
+    if (item.minStock > 0 && item.stock <= item.minStock) return { label: t('ingredients.lowStock'), cls: 'bg-yellow-100 text-yellow-800' };
+    return { label: t('ingredients.inStock'), cls: 'bg-green-100 text-green-800' };
   };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Ingredients</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">{t('ingredients.title')}</h2>
         <Link
           to="/inventory/ingredients/new"
           className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
-          Add Ingredient
+          {t('ingredients.add')}
         </Link>
       </div>
 
       <div className="bg-white rounded-lg shadow p-4 mb-6 flex gap-4">
         <input
           type="text"
-          placeholder="Search ingredients..."
+          placeholder={t('ingredients.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          aria-label="Search ingredients"
+          aria-label={t('ingredients.searchLabel')}
         />
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
           className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          aria-label="Filter by category"
+          aria-label={t('ingredients.filterCategory')}
         >
-          <option value="">All Categories</option>
+          <option value="">{t('ingredients.allCategories')}</option>
           {categories.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
       </div>
 
-      {error && <p className="text-red-600 mb-4">Error: {error}</p>}
+      {error && <p className="text-red-600 mb-4">{t('common.error')}: {error}</p>}
 
       {!loading && items.length === 0 && (
         <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 mb-4">No ingredients found.</p>
+          <p className="text-gray-500 mb-4">{t('ingredients.empty')}</p>
           <Link to="/inventory/ingredients/new" className="text-primary-600 hover:text-primary-700 font-medium">
-            Create your first ingredient
+            {t('ingredients.createFirst')}
           </Link>
         </div>
       )}
 
-      {loading && <p className="text-gray-500">Loading ingredients...</p>}
+      {loading && <p className="text-gray-500">{t('ingredients.loading')}</p>}
 
       {!loading && items.length > 0 && (
         <>
@@ -124,13 +126,13 @@ export default function IngredientList() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Min Stock</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('ingredients.nameCol')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('ingredients.categoryCol')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('ingredients.stockCol')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('ingredients.minStockCol')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('ingredients.unitCol')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('ingredients.costCol')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('ingredients.statusCol')}</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -157,13 +159,13 @@ export default function IngredientList() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-3">
                         <Link to={`/inventory/ingredients/${item.id}/edit`} className="text-primary-600 hover:text-primary-900 font-medium">
-                          Edit
+                          {t('common.edit')}
                         </Link>
                         <Link to={`/inventory/ingredients/${item.id}/stock`} className="text-blue-600 hover:text-blue-900 font-medium">
-                          Stock
+                          {t('ingredients.stockLink')}
                         </Link>
                         <button onClick={() => handleDelete(item.id, item.name)} className="text-red-600 hover:text-red-900 font-medium">
-                          Delete
+                          {t('common.delete')}
                         </button>
                       </td>
                     </tr>
@@ -175,24 +177,24 @@ export default function IngredientList() {
 
           {pagination.totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-gray-500">{pagination.total} items total</p>
+              <p className="text-sm text-gray-500">{t('ingredients.itemsTotal', { count: pagination.total })}</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => fetchItems(pagination.page - 1)}
                   disabled={pagination.page <= 1}
                   className="px-3 py-1 border rounded text-sm disabled:opacity-50"
                 >
-                  Previous
+                  {t('common.previous')}
                 </button>
                 <span className="px-3 py-1 text-sm text-gray-600">
-                  Page {pagination.page} of {pagination.totalPages}
+                  {t('common.pageOf', { page: pagination.page, total: pagination.totalPages })}
                 </span>
                 <button
                   onClick={() => fetchItems(pagination.page + 1)}
                   disabled={pagination.page >= pagination.totalPages}
                   className="px-3 py-1 border rounded text-sm disabled:opacity-50"
                 >
-                  Next
+                  {t('common.next')}
                 </button>
               </div>
             </div>

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsReservation() {
+  const { t } = useTranslation();
   const token = localStorage.getItem('token') || '';
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -45,29 +47,29 @@ export default function SettingsReservation() {
       });
       const data = await res.json();
       if (data.success) {
-        setSuccess('Reservation settings updated');
+        setSuccess(t('settingsReservation.updated'));
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError(typeof data.error === 'string' ? data.error : 'Failed to save');
+        setError(typeof data.error === 'string' ? data.error : t('common.failedToSave'));
       }
     } catch {
-      setError('Network error');
+      setError(t('common.networkError'));
     } finally {
       setSaving(false);
     }
   }
 
-  if (loading) return <div className="p-6 text-gray-500">Loading...</div>;
+  if (loading) return <div className="p-6 text-gray-500">{t('common.loading')}</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <Link to="/settings" className="text-sm text-primary-600 hover:text-primary-700">&larr; Back to Settings</Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-1">Reservation Settings</h1>
+          <Link to="/settings" className="text-sm text-primary-600 hover:text-primary-700">{t('settingsReservation.back')}</Link>
+          <h1 className="text-2xl font-bold text-gray-900 mt-1">{t('settingsReservation.title')}</h1>
         </div>
         <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50">
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? t('common.saving') : t('common.saveChanges')}
         </button>
       </div>
 
@@ -77,36 +79,36 @@ export default function SettingsReservation() {
       <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
         <label className="flex items-center gap-3">
           <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} className="w-4 h-4 text-primary-600 rounded" />
-          <span className="text-sm font-medium text-gray-700">Reservations enabled</span>
+          <span className="text-sm font-medium text-gray-700">{t('settingsReservation.enabled')}</span>
         </label>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Time Interval (min)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('settingsReservation.timeInterval')}</label>
             <input type="number" min={1} value={timeInterval} onChange={(e) => setTimeInterval(parseInt(e.target.value) || 1)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
-            <p className="mt-1 text-xs text-gray-500">Time slot interval for booking slots</p>
+            <p className="mt-1 text-xs text-gray-500">{t('settingsReservation.timeIntervalHelper')}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Stay Time (min)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('settingsReservation.stayTime')}</label>
             <input type="number" min={1} value={stayTime} onChange={(e) => setStayTime(parseInt(e.target.value) || 1)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
-            <p className="mt-1 text-xs text-gray-500">Average time a party occupies a table</p>
+            <p className="mt-1 text-xs text-gray-500">{t('settingsReservation.stayTimeHelper')}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Max Advance Booking (days)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('settingsReservation.maxAdvanceBooking')}</label>
             <input type="number" min={1} value={maxAdvanceBookingDays} onChange={(e) => setMaxAdvanceBookingDays(parseInt(e.target.value) || 1)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Min Cancellation Notice (hours)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('settingsReservation.minCancellationNotice')}</label>
             <input type="number" min={0} value={minCancellationNoticeHours} onChange={(e) => setMinCancellationNoticeHours(parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
           </div>
         </div>
 
         <label className="flex items-center gap-3">
           <input type="checkbox" checked={autoConfirm} onChange={(e) => setAutoConfirm(e.target.checked)} className="w-4 h-4 text-primary-600 rounded" />
-          <span className="text-sm font-medium text-gray-700">Auto-confirm reservations</span>
+          <span className="text-sm font-medium text-gray-700">{t('settingsReservation.autoConfirm')}</span>
         </label>
       </div>
     </div>

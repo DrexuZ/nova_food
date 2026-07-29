@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../lib/api.js';
+import { useTranslation } from 'react-i18next';
 
 interface DeliveryZone {
   id: string;
@@ -12,6 +13,7 @@ interface DeliveryZone {
 }
 
 export default function DeliveryZoneList() {
+  const { t } = useTranslation();
   const { locationId } = useParams<{ locationId: string }>();
   const [zones, setZones] = useState<DeliveryZone[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export default function DeliveryZoneList() {
         try {
           boundaries = JSON.parse(boundariesJson);
         } catch {
-          setError('Invalid JSON for boundaries');
+          setError(t('deliveryZones.invalidJson'));
           setSaving(false);
           return;
         }
@@ -84,7 +86,7 @@ export default function DeliveryZoneList() {
   };
 
   const deleteZone = async (id: string) => {
-    if (!confirm('Delete this delivery zone?')) return;
+    if (!confirm(t('deliveryZones.deleteConfirm'))) return;
     try {
       await api.delete(`/locations/${locationId}/delivery-zones/${id}`);
       setZones((prev) => prev.filter((z) => z.id !== id));
@@ -96,12 +98,12 @@ export default function DeliveryZoneList() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Delivery Zones</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('deliveryZones.title')}</h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
-          {showForm ? 'Cancel' : 'Add Zone'}
+          {showForm ? t('common.cancel') : t('deliveryZones.addZone')}
         </button>
       </div>
 
@@ -111,18 +113,18 @@ export default function DeliveryZoneList() {
         <form onSubmit={handleCreate} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Zone Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('deliveryZones.zoneName')}</label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
-                placeholder="e.g., Downtown"
+                placeholder={t('deliveryZones.namePlaceholder')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Charge ($)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('deliveryZones.deliveryCharge')}</label>
               <input
                 type="number"
                 step="0.01"
@@ -133,7 +135,7 @@ export default function DeliveryZoneList() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Min Order ($)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('deliveryZones.minOrder')}</label>
               <input
                 type="number"
                 step="0.01"
@@ -145,13 +147,13 @@ export default function DeliveryZoneList() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Boundaries (JSON polygon)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('deliveryZones.boundaries')}</label>
             <textarea
               value={boundariesJson}
               onChange={(e) => setBoundariesJson(e.target.value)}
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none font-mono"
-              placeholder='[[lat, lng], [lat, lng], ...]'
+              placeholder={t('deliveryZones.boundariesPlaceholder')}
             />
           </div>
           <button
@@ -159,19 +161,19 @@ export default function DeliveryZoneList() {
             disabled={saving}
             className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
           >
-            {saving ? 'Creating...' : 'Create Zone'}
+            {saving ? t('deliveryZones.creating') : t('deliveryZones.createZone')}
           </button>
         </form>
       )}
 
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label="Loading" />
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label={t('common.loading')} />
         </div>
       )}
 
       {!loading && zones.length === 0 && !showForm && (
-        <p className="text-gray-500 text-center py-12">No delivery zones configured.</p>
+        <p className="text-gray-500 text-center py-12">{t('deliveryZones.empty')}</p>
       )}
 
       {!loading && zones.length > 0 && (
@@ -179,10 +181,10 @@ export default function DeliveryZoneList() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Name</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-600">Charge</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-600">Min Order</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">{t('deliveryZones.name')}</th>
+                <th className="text-right px-4 py-3 font-medium text-gray-600">{t('deliveryZones.charge')}</th>
+                <th className="text-right px-4 py-3 font-medium text-gray-600">{t('deliveryZones.minOrder')}</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">{t('deliveryZones.status')}</th>
                 <th className="text-right px-4 py-3 font-medium text-gray-600">Actions</th>
               </tr>
             </thead>
@@ -199,7 +201,7 @@ export default function DeliveryZoneList() {
                         }`}
                       aria-label={`${zone.isActive ? 'Deactivate' : 'Activate'} zone ${zone.name}`}
                     >
-                      {zone.isActive ? 'Active' : 'Inactive'}
+                      {zone.isActive ? t('common.active') : t('common.inactive')}
                     </button>
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -208,7 +210,7 @@ export default function DeliveryZoneList() {
                       className="text-red-600 hover:text-red-700 text-xs font-medium"
                       aria-label={`Delete zone ${zone.name}`}
                     >
-                      Delete
+                      {t('common.delete')}
                     </button>
                   </td>
                 </tr>

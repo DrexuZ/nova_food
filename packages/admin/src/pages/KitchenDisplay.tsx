@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { api } from '../lib/api.js';
+import { useTranslation } from 'react-i18next';
 
 interface OrderItem {
   id: string;
@@ -38,6 +39,7 @@ const NEXT_ACTION: Record<string, string> = {
 };
 
 export default function KitchenDisplay() {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<KitchenOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -120,11 +122,30 @@ export default function KitchenDisplay() {
     }
   };
 
+  const statusLabel = (s: string) => {
+    const map: Record<string, string> = {
+      PENDING: t('kitchen.statusPending'),
+      CONFIRMED: t('kitchen.statusConfirmed'),
+      PREPARING: t('kitchen.statusPreparing'),
+      READY: t('kitchen.statusReady'),
+    };
+    return map[s] || s;
+  };
+
+  const nextActionLabel = (s: string) => {
+    const map: Record<string, string> = {
+      PENDING: t('kitchen.actionConfirm'),
+      CONFIRMED: t('kitchen.actionStartPreparing'),
+      PREPARING: t('kitchen.actionMarkReady'),
+    };
+    return map[s] || s;
+  };
+
   const getTimeSince = (dateStr: string) => {
     const mins = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000);
-    if (mins < 1) return 'Just now';
-    if (mins < 60) return `${mins}m ago`;
-    return `${Math.floor(mins / 60)}h ${mins % 60}m ago`;
+    if (mins < 1) return t('kitchen.justNow');
+    if (mins < 60) return t('kitchen.minutesAgo', { minutes: mins });
+    return t('kitchen.hoursAgo', { hours: Math.floor(mins / 60), minutes: mins % 60 });
   };
 
   // Separate scheduled vs immediate orders
@@ -146,31 +167,31 @@ export default function KitchenDisplay() {
       {/* Header */}
       <div className="bg-gray-900 text-white px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-lg font-bold text-primary-400">Kitchen Display</h1>
+          <h1 className="text-lg font-bold text-primary-400">{t('kitchen.title')}</h1>
           <div className="flex items-center gap-2" role="status">
             <div className={`w-2 h-2 rounded-full ${socket?.connected ? 'bg-green-400' : 'bg-red-400'}`} />
             <span className="text-xs text-gray-400">
-              {socket?.connected ? 'Live' : 'Disconnected'}
+              {socket?.connected ? t('kitchen.live') : t('kitchen.disconnected')}
             </span>
           </div>
         </div>
         <div className="flex items-center gap-4">
           <span className="text-xs text-gray-400">
-            {orders.length} active orders | Updated {lastRefresh.toLocaleTimeString()}
+            {t('kitchen.statusBar', { count: orders.length, time: lastRefresh.toLocaleTimeString() })}
           </span>
           <button
             onClick={fetchOrders}
             className="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded transition-colors"
-            aria-label="Refresh orders"
+            aria-label={t('kitchen.refreshLabel')}
           >
-            Refresh
+            {t('kitchen.refresh')}
           </button>
         </div>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label="Loading" />
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label={t('common.loading')} />
         </div>
       ) : (
         <>
@@ -178,7 +199,7 @@ export default function KitchenDisplay() {
           {scheduledOrders.length > 0 && (
             <div className="mx-4 mt-4 bg-indigo-50 border border-indigo-200 rounded-lg p-4">
               <h3 className="text-sm font-bold text-indigo-800 mb-2">
-                Scheduled Orders ({scheduledOrders.length})
+                {t('kitchen.scheduled', { count: scheduledOrders.length })}
               </h3>
               <div className="flex flex-wrap gap-3">
                 {scheduledOrders.map((order) => (
@@ -204,7 +225,7 @@ export default function KitchenDisplay() {
                 {/* Column header */}
                 <div className={`rounded-t-lg px-4 py-2 border-b-2 ${config.bg}`}>
                   <div className="flex items-center justify-between">
-                    <h2 className={`font-bold text-sm ${config.color}`}>{config.label}</h2>
+                    <h2 className={`font-bold text-sm ${config.color}`}>{statusLabel(status)}</h2>
                     <span className={`text-xs font-bold ${config.color} bg-white/50 px-2 py-0.5 rounded-full`}>
                       {statusOrders.length}
                     </span>
@@ -214,7 +235,7 @@ export default function KitchenDisplay() {
                 {/* Order cards */}
                 <div className="flex-1 overflow-y-auto space-y-3 py-3">
                   {statusOrders.length === 0 && (
-                    <p className="text-center text-gray-400 text-sm py-8">No orders</p>
+                    <p className="text-center text-gray-400 text-sm py-8">{t('kitchen.noOrders')}</p>
                   )}
                   {statusOrders.map((order) => (
                     <div
@@ -283,7 +304,7 @@ export default function KitchenDisplay() {
                             className="flex-1 bg-primary-600 text-white text-xs font-medium py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                             aria-label={`${NEXT_ACTION[status]} order ${order.orderNumber}`}
                           >
-                            {NEXT_ACTION[status]}
+                            {nextActionLabel(status)}
                           </button>
                         )}
                         {status === 'READY' && (
@@ -293,7 +314,7 @@ export default function KitchenDisplay() {
                             className="flex-1 bg-green-600 text-white text-xs font-medium py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
                             aria-label={`Mark order ${order.orderNumber} as ${order.orderType === 'DELIVERY' ? 'out for delivery' : 'picked up'}`}
                           >
-                            {order.orderType === 'DELIVERY' ? 'Out for Delivery' : 'Picked Up'}
+                            {order.orderType === 'DELIVERY' ? t('kitchen.outForDeliveryLabel') : t('kitchen.pickedUpLabel')}
                           </button>
                         )}
                         <button
@@ -302,7 +323,7 @@ export default function KitchenDisplay() {
                           className="text-red-500 hover:text-red-700 text-xs font-medium px-2 py-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
                           aria-label={`Cancel order ${order.orderNumber}`}
                         >
-                          Cancel
+                          {t('kitchen.cancelLabel')}
                         </button>
                       </div>
                     </div>

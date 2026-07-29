@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Review {
   id: string;
@@ -18,8 +19,9 @@ interface Pagination {
 }
 
 function StarRating({ rating }: { rating: number }) {
+  const { t } = useTranslation();
   return (
-    <span className="text-yellow-400" aria-label={`${rating} out of 5 stars`}>
+    <span className="text-yellow-400" aria-label={t('reviews.stars', { rating })}>
       {Array.from({ length: 5 }, (_, i) => (
         <span key={i} aria-hidden="true">{i < rating ? '★' : '☆'}</span>
       ))}
@@ -28,6 +30,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export default function ReviewList() {
+  const { t } = useTranslation();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,7 +90,7 @@ export default function ReviewList() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Reviews</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('reviews.title')}</h1>
       </div>
 
       <div className="flex gap-3 mb-6">
@@ -95,24 +98,24 @@ export default function ReviewList() {
           value={filter}
           onChange={(e) => { setFilter(e.target.value); setPage(1); }}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-          aria-label="Filter by approval status"
+          aria-label={t('reviews.filterStatus')}
         >
-          <option value="">All Reviews</option>
-          <option value="true">Approved</option>
-          <option value="false">Pending</option>
+          <option value="">{t('reviews.all')}</option>
+          <option value="true">{t('reviews.approved')}</option>
+          <option value="false">{t('reviews.pending')}</option>
         </select>
       </div>
 
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label="Loading" />
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" role="status" aria-label={t('common.loading')} />
         </div>
       )}
 
       {error && <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-4">{error}</div>}
 
       {!loading && !error && reviews.length === 0 && (
-        <p className="text-gray-500 text-center py-12">No reviews found.</p>
+        <p className="text-gray-500 text-center py-12">{t('reviews.empty')}</p>
       )}
 
       {!loading && reviews.length > 0 && (
@@ -132,7 +135,7 @@ export default function ReviewList() {
                   </div>
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${review.isApproved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                     }`}>
-                    {review.isApproved ? 'Approved' : 'Pending'}
+                    {review.isApproved ? t('reviews.approved') : t('reviews.pending')}
                   </span>
                 </div>
                 {review.comment && (
@@ -143,26 +146,26 @@ export default function ReviewList() {
                     <button
                       onClick={() => moderate(review.id, true)}
                       className="text-xs px-3 py-1 bg-green-50 text-green-700 rounded hover:bg-green-100"
-                      aria-label={`Approve review by ${review.customer.name}`}
+                      aria-label={t('reviews.approveLabel', { name: review.customer.name })}
                     >
-                      Approve
+                      {t('reviews.approve')}
                     </button>
                   )}
                   {review.isApproved && (
                     <button
                       onClick={() => moderate(review.id, false)}
                       className="text-xs px-3 py-1 bg-yellow-50 text-yellow-700 rounded hover:bg-yellow-100"
-                      aria-label={`Unapprove review by ${review.customer.name}`}
+                      aria-label={t('reviews.unapproveLabel', { name: review.customer.name })}
                     >
-                      Unapprove
+                      {t('reviews.unapprove')}
                     </button>
                   )}
                   <button
                     onClick={() => deleteReview(review.id)}
                     className="text-xs px-3 py-1 bg-red-50 text-red-700 rounded hover:bg-red-100"
-                    aria-label={`Delete review by ${review.customer.name}`}
-                  >
-                    Delete
+                      aria-label={t('reviews.deleteLabel', { name: review.customer.name })}
+                    >
+                      {t('reviews.delete')}
                   </button>
                 </div>
               </div>
@@ -176,17 +179,17 @@ export default function ReviewList() {
                 onClick={() => setPage((p) => p - 1)}
                 className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50"
               >
-                Previous
+                {t('common.previous')}
               </button>
               <span className="text-sm text-gray-600">
-                Page {pagination.page} of {pagination.totalPages}
+                {t('common.pageOf', { page: pagination.page, total: pagination.totalPages })}
               </span>
               <button
                 disabled={page >= pagination.totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50"
               >
-                Next
+                {t('common.next')}
               </button>
             </div>
           )}

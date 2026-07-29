@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api.js';
 
 interface Movement {
@@ -20,16 +21,6 @@ interface MovementResponse {
   pagination: { page: number; limit: number; total: number; totalPages: number };
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  PURCHASE: 'Purchase',
-  SALE: 'Sale',
-  SPOILAGE: 'Spoilage',
-  ADJUSTMENT_ADD: 'Adjust +',
-  ADJUSTMENT_REMOVE: 'Adjust -',
-  TRANSFER_IN: 'Transfer In',
-  TRANSFER_OUT: 'Transfer Out',
-};
-
 const TYPE_COLORS: Record<string, string> = {
   PURCHASE: 'bg-green-100 text-green-800',
   SALE: 'bg-blue-100 text-blue-800',
@@ -41,11 +32,22 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 export default function InventoryMovements() {
+  const { t } = useTranslation();
   const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState('');
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
+
+  const TYPE_LABELS: Record<string, string> = {
+    PURCHASE: t('movements.purchase'),
+    SALE: t('movements.sale'),
+    SPOILAGE: t('movements.spoilage'),
+    ADJUSTMENT_ADD: t('movements.adjustPlus'),
+    ADJUSTMENT_REMOVE: t('movements.adjustMinus'),
+    TRANSFER_IN: t('movements.transferIn'),
+    TRANSFER_OUT: t('movements.transferOut'),
+  };
 
   const fetchMovements = (page = 1) => {
     setLoading(true);
@@ -66,7 +68,7 @@ export default function InventoryMovements() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Inventory Movements</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">{t('movements.title')}</h2>
       </div>
 
       <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -74,22 +76,22 @@ export default function InventoryMovements() {
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
           className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          aria-label="Filter by type"
+          aria-label={t('movements.filterType')}
         >
-          <option value="">All Types</option>
+          <option value="">{t('movements.allTypes')}</option>
           {Object.entries(TYPE_LABELS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
       </div>
 
-      {error && <p className="text-red-600 mb-4">Error: {error}</p>}
+      {error && <p className="text-red-600 mb-4">{t('common.error')}: {error}</p>}
 
-      {loading && <p className="text-gray-500">Loading movements...</p>}
+      {loading && <p className="text-gray-500">{t('movements.loading')}</p>}
 
       {!loading && movements.length === 0 && (
         <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500">No movements found.</p>
+          <p className="text-gray-500">{t('movements.empty')}</p>
         </div>
       )}
 
@@ -99,14 +101,14 @@ export default function InventoryMovements() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ingredient</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Before</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">After</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">By</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('movements.date')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('movements.type')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('movements.ingredient')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('movements.qty')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('movements.before')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('movements.after')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('movements.reference')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('movements.by')}</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -140,24 +142,24 @@ export default function InventoryMovements() {
 
           {pagination.totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-gray-500">{pagination.total} movements total</p>
+              <p className="text-sm text-gray-500">{t('movements.total', { count: pagination.total })}</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => fetchMovements(pagination.page - 1)}
                   disabled={pagination.page <= 1}
                   className="px-3 py-1 border rounded text-sm disabled:opacity-50"
                 >
-                  Previous
+                  {t('common.previous')}
                 </button>
                 <span className="px-3 py-1 text-sm text-gray-600">
-                  Page {pagination.page} of {pagination.totalPages}
+                  {t('common.pageOf', { page: pagination.page, total: pagination.totalPages })}
                 </span>
                 <button
                   onClick={() => fetchMovements(pagination.page + 1)}
                   disabled={pagination.page >= pagination.totalPages}
                   className="px-3 py-1 border rounded text-sm disabled:opacity-50"
                 >
-                  Next
+                  {t('common.next')}
                 </button>
               </div>
             </div>

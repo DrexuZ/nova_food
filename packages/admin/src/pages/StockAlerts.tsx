@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api.js';
 
 interface Ingredient {
@@ -13,6 +14,7 @@ interface Ingredient {
 }
 
 export default function StockAlerts() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,31 +34,31 @@ export default function StockAlerts() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Stock Alerts</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">{t('stockAlerts.title')}</h2>
         <button
           onClick={fetchAlerts}
           className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
         >
-          Refresh
+          {t('stockAlerts.refresh')}
         </button>
       </div>
 
-      {error && <p className="text-red-600 mb-4">Error: {error}</p>}
+      {error && <p className="text-red-600 mb-4">{t('common.error')}: {error}</p>}
 
-      {loading && <p className="text-gray-500">Checking stock levels...</p>}
+      {loading && <p className="text-gray-500">{t('stockAlerts.loading')}</p>}
 
       {!loading && items.length === 0 && (
         <div className="bg-white rounded-lg shadow p-8 text-center">
           <div className="text-green-500 text-4xl mb-4">&#10003;</div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">All Stock Levels Normal</h3>
-          <p className="text-gray-500">No ingredients are below their minimum stock threshold.</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('stockAlerts.allNormal')}</h3>
+          <p className="text-gray-500">{t('stockAlerts.allNormalDesc')}</p>
         </div>
       )}
 
       {!loading && items.length > 0 && (
         <div className="space-y-3">
           <p className="text-sm text-red-600 font-medium">
-            {items.length} ingredient{items.length > 1 ? 's' : ''} below minimum stock
+            {t('stockAlerts.belowMin', { count: items.length })}
           </p>
           {items.map((item) => {
             const shortage = item.minStock - item.stock;
@@ -70,8 +72,8 @@ export default function StockAlerts() {
                   </div>
                   <div className="mt-2 flex items-center gap-4 text-sm">
                     <span className="text-red-600 font-medium">{item.stock} {item.unit}</span>
-                    <span className="text-gray-400">min: {item.minStock}</span>
-                    <span className="text-gray-400">short: {shortage} {item.unit}</span>
+                    <span className="text-gray-400">{t('stockAlerts.min')}: {item.minStock}</span>
+                    <span className="text-gray-400">{t('stockAlerts.short')}: {shortage} {item.unit}</span>
                   </div>
                   <div className="mt-2 w-full max-w-xs bg-gray-200 rounded-full h-2">
                     <div
@@ -85,13 +87,13 @@ export default function StockAlerts() {
                     to={`/inventory/ingredients/${item.id}/stock`}
                     className="bg-primary-600 text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-primary-700 transition-colors"
                   >
-                    Add Stock
+                    {t('stockAlerts.addStock')}
                   </Link>
                   <Link
                     to={`/inventory/ingredients/${item.id}/edit`}
                     className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded text-xs font-medium hover:bg-gray-200 transition-colors"
                   >
-                    Edit
+                    {t('common.edit')}
                   </Link>
                 </div>
               </div>

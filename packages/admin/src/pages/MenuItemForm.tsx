@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../lib/api.js';
 
 interface OptionValue {
@@ -72,6 +73,7 @@ const emptyOption: MenuOption = {
 };
 
 export default function MenuItemForm() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = !!id;
@@ -258,16 +260,16 @@ export default function MenuItemForm() {
     }
   };
 
-  if (loading) return <p className="text-gray-500">Loading...</p>;
+  if (loading) return <p className="text-gray-500">{t('common.loading')}</p>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold text-gray-800">
-          {isEdit ? 'Edit Menu Item' : 'New Menu Item'}
+          {isEdit ? t('menuItems.edit') : t('menuItems.new')}
         </h2>
         <button onClick={() => navigate('/menu/items')} className="text-gray-500 hover:text-gray-700 text-sm">
-          Back to Menu Items
+          {t('menuItems.back')}
         </button>
       </div>
 
@@ -278,10 +280,10 @@ export default function MenuItemForm() {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Info */}
         <section className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('menuItems.basicInfo')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('menuItems.name')}</label>
               <input
                 type="text"
                 value={form.name}
@@ -291,7 +293,7 @@ export default function MenuItemForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('menuItems.slug')}</label>
               <input
                 type="text"
                 value={form.slug}
@@ -302,7 +304,7 @@ export default function MenuItemForm() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('menuItems.description')}</label>
               <textarea
                 value={form.description}
                 onChange={(e) => updateField('description', e.target.value)}
@@ -311,21 +313,21 @@ export default function MenuItemForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('menuItems.category')}</label>
               <select
                 value={form.categoryId}
                 onChange={(e) => updateField('categoryId', e.target.value)}
                 required
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
-                <option value="">Select category</option>
+                <option value="">{t('menuItems.selectCategory')}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('menuItems.price')}</label>
               <input
                 type="number"
                 value={form.price}
@@ -337,7 +339,7 @@ export default function MenuItemForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('menuItems.sortOrder')}</label>
               <input
                 type="number"
                 value={form.sortOrder}
@@ -354,7 +356,7 @@ export default function MenuItemForm() {
                   onChange={(e) => updateField('isActive', e.target.checked)}
                   className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
-                <span className="text-sm text-gray-700">Active</span>
+                <span className="text-sm text-gray-700">{t('common.active')}</span>
               </label>
               <label className="flex items-center gap-2">
                 <input
@@ -363,11 +365,11 @@ export default function MenuItemForm() {
                   onChange={(e) => updateField('trackStock', e.target.checked)}
                   className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
-                <span className="text-sm text-gray-700">Track Stock</span>
+                <span className="text-sm text-gray-700">{t('menuItems.trackStock')}</span>
               </label>
               {form.trackStock && (
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-700">Qty:</label>
+                  <label className="text-sm text-gray-700">{t('menuItems.qtyLabel')}</label>
                   <input
                     type="number"
                     value={form.stockQty}
@@ -384,7 +386,7 @@ export default function MenuItemForm() {
         {/* Image Upload */}
         {isEdit && (
           <section className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Image</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">{t('menuItems.imageSection')}</h3>
             <div className="flex items-start gap-6">
               {imageUrl ? (
                 <div className="relative">
@@ -398,19 +400,19 @@ export default function MenuItemForm() {
                     onClick={handleImageRemove}
                     disabled={uploading}
                     className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 disabled:opacity-50"
-                    aria-label="Remove image"
+                    aria-label={t('menuItems.removeImage')}
                   >
                     X
                   </button>
                 </div>
               ) : (
                 <div className="w-40 h-40 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-                  <span className="text-sm text-gray-400">No image</span>
+                  <span className="text-sm text-gray-400">{t('menuItems.noImage')}</span>
                 </div>
               )}
               <div>
                 <label className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 cursor-pointer disabled:opacity-50 transition-colors">
-                  {uploading ? 'Uploading...' : 'Upload Image'}
+                    {uploading ? t('common.saving') : t('menuItems.uploadImage')}
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
@@ -419,7 +421,7 @@ export default function MenuItemForm() {
                     className="hidden"
                   />
                 </label>
-                <p className="text-xs text-gray-400 mt-2">JPEG, PNG, WebP, or GIF. Max 5MB.</p>
+                <p className="text-xs text-gray-400 mt-2">{t('menuItems.imageHelper')}</p>
               </div>
             </div>
           </section>
@@ -428,45 +430,45 @@ export default function MenuItemForm() {
         {/* Menu Options */}
         <section className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Menu Options</h3>
+            <h3 className="text-lg font-medium text-gray-900">{t('menuItems.optionsSection')}</h3>
             <button type="button" onClick={addOption} className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-              + Add Option Group
+              + {t('menuItems.addOptionGroup')}
             </button>
           </div>
           {options.length === 0 && (
-            <p className="text-sm text-gray-400">No options configured. Add option groups like "Size", "Toppings", etc.</p>
+            <p className="text-sm text-gray-400">{t('menuItems.noOptions')}</p>
           )}
           <div className="space-y-6">
             {options.map((opt, optIdx) => (
               <div key={optIdx} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-gray-700">Option Group #{optIdx + 1}</span>
+                  <span className="text-sm font-medium text-gray-700">{t('menuItems.optionGroup', { number: optIdx + 1 })}</span>
                   <button type="button" onClick={() => removeOption(optIdx)} className="text-red-500 hover:text-red-700 text-sm">
-                    Remove Group
+                    {t('menuItems.removeGroup')}
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Name *</label>
+                    <label className="block text-xs text-gray-500 mb-1">{t('menuItems.optionName')}</label>
                     <input
                       type="text"
                       value={opt.name}
                       onChange={(e) => updateOption(optIdx, 'name', e.target.value)}
-                      placeholder="e.g. Size"
+                      placeholder={t('menuItems.optionNamePlaceholder')}
                       className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Display Type</label>
+                    <label className="block text-xs text-gray-500 mb-1">{t('menuItems.displayType')}</label>
                     <select
                       value={opt.displayType}
                       onChange={(e) => updateOption(optIdx, 'displayType', e.target.value)}
                       className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
                     >
-                      <option value="SELECT">Select</option>
-                      <option value="RADIO">Radio</option>
-                      <option value="CHECKBOX">Checkbox</option>
-                      <option value="QUANTITY">Quantity</option>
+                      <option value="SELECT">{t('menuItems.displaySelect')}</option>
+                      <option value="RADIO">{t('menuItems.displayRadio')}</option>
+                      <option value="CHECKBOX">{t('menuItems.displayCheckbox')}</option>
+                      <option value="QUANTITY">{t('menuItems.displayQuantity')}</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-4 mt-4">
@@ -477,7 +479,7 @@ export default function MenuItemForm() {
                         onChange={(e) => updateOption(optIdx, 'isRequired', e.target.checked)}
                         className="rounded border-gray-300 text-primary-600"
                       />
-                      <span className="text-xs text-gray-700">Required</span>
+                      <span className="text-xs text-gray-700">{t('menuItems.required')}</span>
                     </label>
                   </div>
                 </div>
@@ -485,9 +487,9 @@ export default function MenuItemForm() {
                 {/* Option Values */}
                 <div className="ml-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-500">Values</span>
+                    <span className="text-xs font-medium text-gray-500">{t('menuItems.values')}</span>
                     <button type="button" onClick={() => addOptionValue(optIdx)} className="text-primary-600 text-xs font-medium">
-                      + Add Value
+                      + {t('menuItems.addValue')}
                     </button>
                   </div>
                   {opt.values.map((val, valIdx) => (
@@ -496,7 +498,7 @@ export default function MenuItemForm() {
                         type="text"
                         value={val.name}
                         onChange={(e) => updateOptionValue(optIdx, valIdx, 'name', e.target.value)}
-                        placeholder="Value name"
+                        placeholder={t('menuItems.valueName')}
                         className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm"
                       />
                       <div className="flex items-center gap-1">
@@ -516,10 +518,10 @@ export default function MenuItemForm() {
                           onChange={(e) => updateOptionValue(optIdx, valIdx, 'isDefault', e.target.checked)}
                           className="rounded border-gray-300 text-primary-600"
                         />
-                        <span className="text-xs text-gray-500">Default</span>
+                        <span className="text-xs text-gray-500">{t('menuItems.default')}</span>
                       </label>
                       {opt.values.length > 1 && (
-                        <button type="button" onClick={() => removeOptionValue(optIdx, valIdx)} className="text-red-400 hover:text-red-600 text-xs" aria-label={`Remove value ${val.name || valIdx + 1}`}>
+                        <button type="button" onClick={() => removeOptionValue(optIdx, valIdx)} className="text-red-400 hover:text-red-600 text-xs" aria-label={t('menuItems.removeValue', { name: val.name || valIdx + 1 })}>
                           X
                         </button>
                       )}
@@ -536,9 +538,9 @@ export default function MenuItemForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Allergens */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Allergens</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">{t('menuItems.allergens')}</h3>
               {allergens.length === 0 ? (
-                <p className="text-sm text-gray-400">No allergens defined.</p>
+                <p className="text-sm text-gray-400">{t('menuItems.noAllergens')}</p>
               ) : (
                 <div className="space-y-2">
                   {allergens.map((a) => (
@@ -564,9 +566,9 @@ export default function MenuItemForm() {
 
             {/* Mealtimes */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Mealtimes</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">{t('menuItems.mealtimes')}</h3>
               {mealtimes.length === 0 ? (
-                <p className="text-sm text-gray-400">No mealtimes defined.</p>
+                <p className="text-sm text-gray-400">{t('menuItems.noMealtimes')}</p>
               ) : (
                 <div className="space-y-2">
                   {mealtimes.map((m) => (
@@ -596,14 +598,14 @@ export default function MenuItemForm() {
         <div className="flex justify-end gap-3">
           {isEdit && (
             <button type="button" onClick={() => navigate(`/menu/items/${id}/recipe`)} className="px-6 py-2 border border-blue-300 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors">
-              Manage Recipe
+              {t('menuItems.manageRecipe')}
             </button>
           )}
           <button type="button" onClick={() => navigate('/menu/items')} className="px-6 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
-            Cancel
+            {t('common.cancel')}
           </button>
           <button type="submit" disabled={saving} className="px-6 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors">
-            {saving ? 'Saving...' : isEdit ? 'Update Item' : 'Create Item'}
+            {saving ? t('common.saving') : isEdit ? t('menuItems.update') : t('menuItems.create')}
           </button>
         </div>
       </form>

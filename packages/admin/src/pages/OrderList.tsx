@@ -71,6 +71,13 @@ export default function OrderList() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{t('orders.title')}</h1>
+        <Link
+          to="/orders/new"
+          className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
+        >
+          <span>+</span>
+          {t('orders.newSale')}
+        </Link>
       </div>
 
       {/* Filters */}

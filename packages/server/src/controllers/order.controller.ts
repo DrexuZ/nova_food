@@ -65,8 +65,11 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
   // Get customer ID from auth if available
   const customerId = (req as any).user?.type === 'customer' ? (req as any).user.id : null;
 
-  // Guest checkout: require name + email if not authenticated
-  if (!customerId) {
+  // Staff POS: allow staff-created orders without guest info
+  const isStaff = (req as any).user?.type === 'staff';
+
+  // Guest checkout: require name + email if not authenticated (unless staff POS)
+  if (!customerId && !isStaff) {
     if (!guestName || !guestEmail) {
       res.status(400).json({ success: false, error: 'Guest name and email are required for guest checkout' });
       return;

@@ -24,6 +24,7 @@ import RecipeForm from './pages/RecipeForm.js';
 import TableList from './pages/TableList.js';
 import OrderList from './pages/OrderList.js';
 import OrderDetailPage from './pages/OrderDetail.js';
+import OrderPos from './pages/OrderPos.js';
 import ReservationList from './pages/ReservationList.js';
 import ReservationDetail from './pages/ReservationDetail.js';
 import ReservationTrends from './pages/ReservationTrends.js';
@@ -87,6 +88,7 @@ function AppRoutes() {
         {/* All roles */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/orders" element={<OrderList />} />
+        <Route path="/orders/new" element={<OrderPos />} />
         <Route path="/orders/:id" element={<OrderDetailPage />} />
         <Route path="/reservations" element={<ReservationList />} />
         <Route path="/reservations/trends" element={<ReservationTrends />} />

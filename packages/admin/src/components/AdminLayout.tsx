@@ -35,6 +35,7 @@ export default function AdminLayout({ children, onLogout }: { children: React.Re
   const navItems = useMemo<NavItem[]>(() => [
     { path: '/', label: t('nav.dashboard'), icon: '□', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
     { path: '/orders', label: t('nav.orders'), icon: '📋', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
+    { path: '/orders/new', label: t('nav.newSale'), icon: '🧾', roles: ['SUPER_ADMIN', 'MANAGER', 'STAFF'] },
     {
       path: '/reservations',
       label: t('nav.reservations'),
